@@ -540,6 +540,8 @@
 						return $v;
 					} else if (preg_match('/You didn\'t choose a source/i', $v)) {
 						return $v;
+					} else if (preg_match('/Destination folder .* is not writeable/i', $v)) {
+						return $v;
 					}
 				}
 			}
