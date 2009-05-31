@@ -545,7 +545,6 @@
 					// 	return $v;
 					// } else if (preg_match('/Destination folder .* is not writable/i', $v)) {
 					// 	return $v;
-					}
 				}
 			}
 		}
