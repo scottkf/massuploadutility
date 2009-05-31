@@ -12,7 +12,7 @@
 		public function about() {
 			return array(
 				'name'			=> 'Mass Upload Utility',
-				'version'		=> '0.5',
+				'version'		=> '0.9',
 				'release-date'	=> '2009-05-31',
 				'author'		=> array(
 					'name'			=> 'Scott Tesoriere',

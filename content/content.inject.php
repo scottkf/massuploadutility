@@ -76,6 +76,10 @@
 		function __actionDo(){
 			if (!isset($_POST['fields']['source']) or $_POST['fields']['source'] <= 0)
 				{ $this->_errors[] = 'You didn\'t choose a source, perhaps you don\'t have any sections with an upload field in them?'; $this->_valid = false; return; }
+			if (!isset($_POST['fields']['sourcedir']) or !preg_match('/^\/workspace\/uploads\/mui/i', $_POST['fields']['sourcedir']))
+				{ $this->_errors[] = 'Fail!'; $this->_valid = false; return; }
+			
+
 			$this->_section_id = $_POST['fields']['source']; // section id
 			$entryManager = new EntryManager($this->_Parent);
 
@@ -112,15 +116,16 @@
 					$name = $field->get('element_name');
 					$tmp_name = DOCROOT . $_POST['fields']['sourcedir'] . '/' . $f;
 					$new_name = DOCROOT . $dest . '/' . $f;
-					if($field->get('validator') != NULL){
-					    $rule = $field->get('validator');
-							
-							// skip this file since it doesn't validate
-					    if(!General::validateString($tmp_name, $rule)) {
-								unset($files['filelist'][$k]);
-								// $continue = true;
-							}
-					}
+					/* if you don't want to rollback implement this */
+					// if($field->get('validator') != NULL){
+					//     $rule = $field->get('validator');
+					// 		
+					// 		// skip this file since it doesn't validate
+					//     if(!General::validateString($tmp_name, $rule)) {
+					// 			;
+					// 			// $continue = true;
+					// 		}
+					// }
 					$type = trim(shell_exec('file -b --mime '.escapeshellarg($tmp_name)));
 					$size = filesize($tmp_name);
 
@@ -156,7 +161,7 @@
 
 				// setup the data, process it
 				if(__ENTRY_OK__ != $this->setDataFromPost($entry, $fields, $this->_errors, false, false, $entries))
-				{ break; }
+				{ $this->_ignored_files[] = $f; break; }
 
 				// commit the entry if we made it
 				if(!$entry->commit()){
@@ -174,11 +179,19 @@
 				return;
 			}
 			// if we made it here, and they want us to delete the files, it shall beDOCROOT . $_POST['fields']['sourcedir']
+			if (isset($_POST['fields']['remove']) && 
+					$_POST['fields']['remove'] == 'on' && 
+					$this->_valid == true) {
+				foreach ($files['filelist'] as $k=>$f)
+					unlink(DOCROOT . $_POST['fields']['sourcedir'].'/'.$f);
 
-			print_r($_POST);
-			// foreach ($files['filelist'] as $k=>$f)
-			// 	unlink(DOCROOT . $_POST['fields']['sourcedir'].'/'.$f);
-
+				// already sanitized the sourcedir so no one can accidentally delete stuff 
+				// 	from anywhere but the uploads directory, make sure not to delete mui dir
+				if ($_POST['fields']['sourcedir'] != '/workspace'.$this->_driver->getMUI()) {
+					rmdir(DOCROOT . $_POST['fields']['sourcedir'].'/');
+				}
+			}
+			$this->_entries_count = count($files['filelist']) - count($this->_ignored_files);
 		}
 		
 
@@ -234,7 +247,7 @@
 					  'simUploadLimit': 2,
 						'folder'    : '".(($path != '') ? '/'.$path : '')."/workspace".$this->_driver->getMUI()."/".$folder_name."',
 					  'multi'			: true,
-			      'onAllComplete': function(event, queueID, fileObj, response, data) { $('#guideme').html('Upload complete! <b>Add more or click the big button!</b>'); $('#uploadcomplete').show(); },
+			      'onAllComplete': function(event, queueID, fileObj, response, data) { $('#guideme').html('Upload complete! <b>Add more or click the button that says Process Files!</b>'); $('#uploadcomplete').show(); },
 						'onError': function (a, b, c, d) {
 							if (d.status == 404)
 								alert('Could not find upload script. Use a path relative to: '+'<?= getcwd() ?>');
@@ -265,7 +278,7 @@
 			$fieldset->appendChild($queue);
 
 			/* now the section fields */
-			$submit = Widget::Input('action[save]','Upload complete, time to upload!','button', array('accesskey' => 's'));
+			$submit = Widget::Input('action[save]','Process files','button', array('accesskey' => 's'));
 			$submit->setAttribute('onClick', "window.location='".$this->_uri."/do'");
 			$actions = new XMLElement('div');
 			$actions->setAttribute('class', 'actions');
@@ -301,7 +314,7 @@
 			}
 			elseif (count($_POST) > 0) {
 				$this->pageAlert(
-					"Successfully {$this->_status} a whole slew of entries, {$this->_entries_count} to be exact. 
+					"Successfully added a whole slew of entries, {$this->_entries_count} to be exact. 
 					To do it again, <a href=\"{$this->_uri}/\">Give it another go below.</a>",
 					Alert::SUCCESS, 
 					array('created', URL, 'extension/multipleuploadinjector'));
@@ -363,7 +376,7 @@
 			$div = new XMLElement('div');
 			$div->setAttribute('class', 'group');
 			$label = Widget::Label(__('Delete directory and contents after successful import?'));
-			$label->appendChild(Widget::Input('fields[remove]', 'no', 'checkbox'));
+			$label->appendChild(Widget::Input('fields[remove]', null, 'checkbox'));
 			$div->appendChild($label);
 			$fieldset->appendChild($div);
 
@@ -518,7 +531,13 @@
 					if ( preg_match("/File Chosen in \'.*\' does not match allowable file types for that field/i", $v)) {
 						$a = 'File \''.implode(', ', $this->_ignored_files).'\' does not match allowable filetypes for that fields. Please remove this file and try again.';
 						return $a;
-					} else if (preg_match('/A file with the name/', $v)) {
+					} else if (preg_match('/A file with the name/i', $v)) {
+						return $v;
+					} else if (preg_match('/There are no files/i', $v)) {
+						return $v;
+					} else if (preg_match('/^Fail/i', $v)) {
+						return $v;
+					} else if (preg_match('/You didn\'t choose a source/i', $v)) {
 						return $v;
 					}
 				}
