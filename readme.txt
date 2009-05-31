@@ -31,3 +31,10 @@ Usage
   section.
 
 2.  ????
+
+
+TROUBLESHOOTING
+-------------------------------------------------------------------------------
+
+INSTALLING: If you have problems installing, manually create the 
+	/workspace/upload/mui directory and chmod it 777, Then try installing again.

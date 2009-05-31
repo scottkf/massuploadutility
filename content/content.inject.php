@@ -15,7 +15,7 @@
 		- sloppy as shit
 		- the error logic is weird and slapped together, and needs to be fixed
 		- probably only works with the default upload field
-		- 
+		- this will not install on most servers unless workspace is 777 (or /workspace/upload)
 	
 	*/
 
