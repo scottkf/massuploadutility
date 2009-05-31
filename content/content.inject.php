@@ -529,11 +529,12 @@
 		public function parseErrors() {
 			if (is_array($this->_errors)) {
 				foreach ($this->_errors as $k=>$v) {
-					if ( preg_match("/File Chosen in \'.*\' does not match allowable file types for that field/i", $v)) {
+					if (preg_match("/File Chosen in \'.*\' does not match allowable file types for that field/i", $v)) {
 						$a = 'File \''.implode(', ', $this->_ignored_files).'\' does not match allowable filetypes for that fields. Please remove this file and try again.';
 						return $a;
-					} else if (!preg_match('/required/i', $v)) 
-						return $v;
+					} else if (!preg_match('/required/i', $v)) {
+						return $v; 
+					}
 					// } else if (preg_match('/A file with the name/i', $v)) {
 					// 	return $v;
 					// } else if (preg_match('/There are no files/i', $v)) {
