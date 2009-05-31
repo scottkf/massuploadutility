@@ -235,7 +235,7 @@
 				; // could already exist echo "failed!";
 			// echo $path;
 			// echo WORKSPACE.$this->upload.'/'.$folder_name;
-			echo $_SERVER['DOCUMENT_ROOT']."/".$path."/workspace".$this->_driver->getMUI()."/".$folder_name;
+			// echo $_SERVER['DOCUMENT_ROOT']."/".$path."/workspace".$this->_driver->getMUI()."/".$folder_name;
 			// echo $folder_name;
 			$js = "
 				$(document).ready(function() {
