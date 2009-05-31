@@ -232,7 +232,7 @@
 			$path = preg_replace('/^http\:\/\/.*\//i', '', URL);
 			if (preg_match('/http\:\/\//i', $path)) $path = '';
 			if (!General::realiseDirectory(WORKSPACE.$this->_driver->getMUI().'/'.$folder_name, intval('0755', 8)))
-				echo "failed!";
+				; // could already exist echo "failed!";
 			// echo $path;
 			// echo WORKSPACE.$this->upload.'/'.$folder_name;
 			echo $_SERVER['DOCUMENT_ROOT']."/".$path."/workspace".$this->_driver->getMUI()."/".$folder_name;
