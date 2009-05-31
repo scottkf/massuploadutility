@@ -230,7 +230,8 @@
 			$script->setAttribute("type", 'text/javascript');
 			$folder_name = date("Y-m-d");
 			$path = preg_replace('/^http\:\/\/.*\//i', '', URL);
-			if (!General::realiseDirectory(WORKSPACE.$this->_driver->getMUI().'/'.$folder_name, intval('0777', 8)))
+			if (preg_match('/http\:\/\//i', $path)) $path = '';
+			if (!General::realiseDirectory(WORKSPACE.$this->_driver->getMUI().'/'.$folder_name, intval('0755', 8)))
 				echo "failed!";
 			// echo $path;
 			// echo WORKSPACE.$this->upload.'/'.$folder_name;
