@@ -53,7 +53,7 @@
 			return array(
 				array(
 					'location'	=> 200,
-					'name'	=> 'Mass File Upload',
+					'name'	=> 'Mass Upload Utility',
 					'link'	=> '/inject/'
 				)
 			);

@@ -1,9 +1,9 @@
 Multiple Upload Injector
 -------------------------------------------------------------------------------
 
-Version: .1
+Version: .9
 Author: Scott Tesoriere <scott@tesoriere.com>
-Build Date: 29 May 2009
+Build Date: 31 May 2009
 Github Repository: http://github.com/scottkf/multiple-upload-injector/tree/master
 Requirements: Symphony 2
 
