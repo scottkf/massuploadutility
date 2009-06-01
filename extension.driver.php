@@ -1,6 +1,5 @@
 <?php
 
-	
 	class Extension_MassUploadUtility extends Extension {
 	/*-------------------------------------------------------------------------
 		Definition:

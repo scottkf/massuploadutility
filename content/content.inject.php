@@ -5,7 +5,6 @@
 	require_once(TOOLKIT . '/class.entrymanager.php');
 	require_once(TOOLKIT . '/class.authormanager.php');	
 
-
 	/*
 		Caveats:
 		- It rolls back all entries if any of them error (file doesn't validate, can't copy, you left some fields, duplicates)
@@ -188,7 +187,7 @@
 				// already sanitized the sourcedir so no one can accidentally delete stuff 
 				// 	from anywhere but the uploads directory, make sure not to delete mui dir
 				if ($_POST['fields']['sourcedir'] != '/workspace'.$this->_driver->getMUI()) {
-					rmdir(DOCROOT . $_POST['fields']['sourcedir'].'/');
+					rmdir(DOCROOT . $_POST['fields']['sourcedir']);
 				}
 			}
 			$this->_entries_count = count($files['filelist']) - count($this->_ignored_files);
