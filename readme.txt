@@ -1,9 +1,9 @@
-Multiple Upload Injector
+Mass Upload Utility
 -------------------------------------------------------------------------------
 
-Version: .9
+Version: .95
 Author: Scott Tesoriere <scott@tesoriere.com>
-Build Date: 31 May 2009
+Build Date: 22 March 2010
 Github Repository: http://github.com/scottkf/multiple-upload-injector/tree/master
 Requirements: Symphony 2
 
@@ -17,10 +17,10 @@ for getting the mimetype reliably, and copy to take care of the copying!
 Installation
 -------------------------------------------------------------------------------
 
-1.  Upload the 'multipleuploadinjector' folder in this archive to your Symphony
+1.  Upload the 'massuploadutilty' folder in this archive to your Symphony
   'extensions' folder.
 
-2.  Enable it by selecting the "Multiple Upload Injector", choose Enable from 
+2.  Enable it by selecting the "Mass Upload Utility", choose Enable from 
   the with-selected menu, then click Apply.
 
 
