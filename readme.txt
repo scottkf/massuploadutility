@@ -4,7 +4,7 @@ Mass Upload Utility
 Version: .95
 Author: Scott Tesoriere <scott@tesoriere.com>
 Build Date: 22 March 2010
-Github Repository: http://github.com/scottkf/multiple-upload-injector/tree/master
+Github Repository: http://github.com/scottkf/massuploadutility/tree/master
 Requirements: Symphony 2
 
 A symphony extension to allow you to add a folder of files into a section that 
