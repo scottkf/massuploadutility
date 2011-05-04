@@ -78,6 +78,7 @@
 		Utility functions:
 	-------------------------------------------------------------------------*/
 		public function setupFolder() {
+			// this is wrong for setting up the original page
 			if (file_exists(WORKSPACE.$this->upload)) return true;
 			try {
 				General::realiseDirectory(WORKSPACE.$this->upload, intval('0755', 8));

@@ -194,6 +194,7 @@
 				}
 			}
 			$this->_entries_count = count($files['filelist']) - count($this->_ignored_files);
+			
 		}
 		
 
@@ -289,14 +290,6 @@
 			$div->setAttribute('style', 'display:none');
 			$actions->appendChild($submit);
 			$div->appendChild($actions);
-			// <p><strong>Multiple File Upload</strong></p>
-			// <input style="display: none;" id="fileInput2" name="fileInput2" height="30" type="file" width="110">
-			// <embed src="/_scripts/uploader.swf?fileUploadID=fileInput2&amp;pagepath=/demo/&amp;script=/_scripts/upload.php&amp;folder=/_uploads&amp;btnWidth=110&amp;btnHeight=30&amp;wmode=opaque&amp;multi=true&amp;fileDataName=Filedata" 
-			//     quality="high" id="fileInput2Uploader" class="fileUploaderBtn" name="fileInput2Uploader" allowscriptaccess="sameDomain" wmode="opaque" type="application/x-shockwave-flash" height="30" width="110"
-			//     />
-			// <div id="fileInput2Queue" class="fileUploadQueue"></div>
-			//   <br>
-			//   <a href="javascript:$('#fileInput2').fileUploadStart();">Upload Files</a> | <a href="javascript:$('#fileInput2').fileUploadClearQueue();">Clear Queue</a>
 
 			$this->Form->appendChild($fieldset);
 			$this->Form->appendChild($div);
@@ -314,6 +307,7 @@
 				}
 			}
 			elseif (count($_POST) > 0) {
+				redirect(SYMPHONY_URL . '/publish/');
 				$this->pageAlert(
 					"Successfully added a whole slew of entries, {$this->_entries_count} to be exact. 
 					To do it again, <a href=\"{$this->_uri}/\">Give it another go below.</a>",
@@ -434,9 +428,11 @@
 			}
 			
 			$this->Form->appendChild($fieldset);
+			$hidden = Widget::Input('redirect_to', General::sanitize($_GET['source']), 'hidden');
 			$submit = Widget::Input('action[save]','Process files','submit', array('accesskey' => 's'));
 			$div = new XMLElement('div');
 			$div->setAttribute('class', 'actions');
+			$div->appendChild($hidden);
 			$div->appendChild($submit);
 			$this->Form->appendChild($div);
 
