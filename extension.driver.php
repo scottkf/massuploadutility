@@ -28,8 +28,16 @@
 		
 		public function install() {
 			if (file_exists(WORKSPACE.$this->upload)) return true;
-			if (!General::realiseDirectory(WORKSPACE.$this->upload, intval('0755', 8)))
+			try {
+				if (!General::realiseDirectory(WORKSPACE.$this->upload, intval('0755', 8))) {
+				}
+			}
+			catch(Exception $e) {
+				if(isset(Administration::instance()->Page)){
+					Administration::instance()->Page->pageAlert('Couldn\'t create '.WORKSPACE.'/uploads/mui directory, chmod this folder to 777.', Alert::ERROR);
+				}
 				return false;
+			}
 			return true;
 		}
 		
