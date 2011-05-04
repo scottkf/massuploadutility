@@ -1,11 +1,14 @@
 Multiple Upload Injector
 -------------------------------------------------------------------------------
 
-Version: .9
+Version: 2.2.1
 Author: Scott Tesoriere <scott@tesoriere.com>
-Build Date: 31 May 2009
-Github Repository: http://github.com/scottkf/multiple-upload-injector/tree/master
-Requirements: Symphony 2
+Build Date: 04 May 2011
+Github Repository: http://github.com/scottkf/massuploadutility/tree/v2.2.1
+Requirements: Symphony 2.2.1
+
+If you're using an older version of Symphony, please use v0.9 of the Mass Upload Utility:
+https://github.com/scottkf/massuploadutility/tree/v0.9
 
 A symphony extension to allow you to add a folder of files into a section that 
 has an upload field, it probably doesn't work with other upload fields.
@@ -17,10 +20,10 @@ for getting the mimetype reliably, and copy to take care of the copying!
 Installation
 -------------------------------------------------------------------------------
 
-1.  Upload the 'multipleuploadinjector' folder in this archive to your Symphony
+1.  Upload the 'massuploadutility' folder in this archive to your Symphony
   'extensions' folder.
 
-2.  Enable it by selecting the "Multiple Upload Injector", choose Enable from 
+2.  Enable it by selecting the "Mass Upload Utility", choose Enable from 
   the with-selected menu, then click Apply.
 
 
@@ -30,7 +33,9 @@ Usage
 1.  View the System > Add Multiple Files page to jam a bunch of files into a
   section.
 
-2.  ????
+2.  Upload Files
+
+3.  Click the button that says 'Process'
 
 
 TROUBLESHOOTING
