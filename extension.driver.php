@@ -11,8 +11,8 @@
 		public function about() {
 			return array(
 				'name'			=> 'Mass Upload Utility',
-				'version'		=> '0.9',
-				'release-date'	=> '2009-05-31',
+				'version'		=> '2.2.1',
+				'release-date'	=> '2011-05-04',
 				'author'		=> array(
 					'name'			=> 'Scott Tesoriere',
 					'website'		=> 'http://tesoriere.com',
@@ -42,7 +42,7 @@
 				),
 	      array(
        	 	'page'    => '/backend/',
-	        'delegate'  => 'InitaliseAdminPageHead',
+	        'delegate'  => 'AdminPagePreGenerate',
 	        'callback'  => 'initaliseAdminPageHead'
       ));
 		}
@@ -62,7 +62,6 @@
       $page = $context['parent']->Page;
       if ($page instanceof contentExtensionMassuploadUtilityInject and $page->_context['page'] != 'do') {      
         $page->addStylesheetToHead(URL . '/extensions/massuploadutility/assets/uploadify.css', 'screen', 100100991);
-        $page->addScriptToHead(URL . '/extensions/massuploadutility/assets/jquery-1.3.2.min.js', 100100992);
         $page->addScriptToHead(URL . '/extensions/massuploadutility/assets/jquery.uploadify.js',100100992);
       }
       

@@ -142,7 +142,7 @@
 					$fields[$name][file] = preg_replace("/^\/workspace/", '', $dest) . '/' . $f;
 					$fields[$name][size] = $size;
 					$fields[$name][mimetype] = $type;
-					$fields[$name][meta] = serialize($this->getMetaInfo(DOCROOT . $fields[$name][file], $type));
+					$fields[$name][meta] = serialize($this->getMetaInfo($tmp_name, $type));
 				}
 
 				// skip the file if it doesn't validate
@@ -167,7 +167,10 @@
 					define_safe('__SYM_DB_INSERT_FAILED__', true);
 				}
 				else
+				{
 					$this->_valid = true;
+					$this->_Parent->ExtensionManager->notifyMembers('EntryPostCreate', '/publish/new/', array('section' => $section, 'fields' => &$values, 'entry' => &$entry));
+				}
 
 			}
 
@@ -309,7 +312,7 @@
 					$this->pageAlert("
 						An error occurred while processing this form.
 						<a href=\"#error\">".$this->parseErrors()." Rolling back.</a>",
-						AdministrationPage::PAGE_ALERT_ERROR);
+						Alert::ERROR);
 				}
 			}
 			elseif (count($_POST) > 0) {
@@ -361,7 +364,7 @@
 			$options = array();
 			$options[] = array('/workspace'.$this->_driver->getMUI(), false, '/workspace'.$this->_driver->getMUI());
 			$ignore = array('events', 'data-sources', 'text-formatters', 'pages', 'utilities');
-			$directories = General::listDirStructure(WORKSPACE . $this->_driver->getMUI(), true, 'asc', DOCROOT, $ignore);	   	
+                        $directories = General::listDirStructure(WORKSPACE . $this->_driver->getMUI(), null, true, DOCROOT, $ignore);			
 			if(!empty($directories) && is_array($directories)){
 				foreach($directories as $d) {
 					$d = '/' . trim($d, '/');
@@ -464,9 +467,11 @@
 			$status = __ENTRY_OK__;
 			// Entry has no ID, create it:
 			if(!$entry->get('id') && $simulate == false) {
+				$entry->assignEntryId();
+				/* older 
 				$entry->_engine->Database->insert($entry->get(), 'tbl_entries');
 				if(!$entry_id = $entry->_engine->Database->getInsertID()) return __ENTRY_FIELD_ERROR__;
-				$entry->set('id', $entry_id);
+				$entry->set('id', $entry_id); */
 			}			
 
 			$SectionManager = new SectionManager($this->_Parent);
@@ -514,7 +519,7 @@
 			
 			$meta = array();
 			
-			$meta['creation'] = DateTimeObj::get('c', filemtime($file));
+			$meta['creation'] = DateTimeObj::get('c', time());
 			
 			if(in_array($type, $imageMimeTypes) && $array = @getimagesize($file)){
 				$meta['width']    = $array[0];
