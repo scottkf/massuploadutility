@@ -213,11 +213,9 @@
 			$fieldset = new XMLElement('fieldset');
 			$fieldset->setAttribute('class', 'settings');
 			$fieldset->appendChild(new XMLElement('legend', 'Essentials'));
-
-
 			$p = new XMLElement('p');
 			$p->setAttribute('id', 'guideme');
-			$p->setValue('Upload some files. They will be put under a directory named: <b>/workspace'.$this->_driver->getMUI().'/'.date('Y-m-d').'.</b>');
+			$p->setValue('Upload some files to the <em>'.General::sanitize($_GET['source']).'</em> section. They will be put under a directory named: <b>/workspace'.$this->_driver->getMUI().'/'.date('Y-m-d').'.</b>');
 
 			$fileinput = new XMLElement('div');
 			$fileinput->setAttribute('id', 'fileInput');
@@ -233,24 +231,23 @@
 			$folder_name = date("Y-m-d");
 			$path = preg_replace('/^http\:\/\/.*\//i', '', URL);
 			if (preg_match('/http\:\/\//i', $path)) $path = '';
-			if (!General::realiseDirectory(WORKSPACE.$this->_driver->getMUI().'/'.$folder_name, intval('0755', 8)))
-				; // could already exist echo "failed!";
+			$this->_driver->setupFolder();
 			// echo $path;
 			// echo WORKSPACE.$this->upload.'/'.$folder_name;
 			// echo $_SERVER['DOCUMENT_ROOT']."/".$path."/workspace".$this->_driver->getMUI()."/".$folder_name;
 			// echo $folder_name;
 			$js = "
-				$(document).ready(function() {
-					$('#fileInput').fileUpload ({
-						'uploader'  : '".URL."/extensions/massuploadutility/assets/uploader.swf',
-						'script'    : '".(($path != '') ? '/'.$path : '')."/extensions/massuploadutility/assets/upload.php',
+				jQuery(document).ready(function() {
+					jQuery('#fileInput').uploadify ({
+						'uploader'  : '".URL."/extensions/massuploadutility/assets/uploadify.swf',
+						'script'    : '".(($path != '') ? '/'.$path : '')."/extensions/massuploadutility/assets/uploadify.php',
 						'cancelImg' : '".URL."/extensions/massuploadutility/assets/cancel.png',
 						'auto'      : true,
-					  'displayData': 'speed',
-					  'simUploadLimit': 2,
+					  	'displayData': 'speed',
+					  	'simUploadLimit': 2,
 						'folder'    : '".(($path != '') ? '/'.$path : '')."/workspace".$this->_driver->getMUI()."/".$folder_name."',
-					  'multi'			: true,
-			      'onAllComplete': function(event, queueID, fileObj, response, data) { $('#guideme').html('Upload complete! <b>Add more or click the button that says Process Files!</b>'); $('#uploadcomplete').show(); },
+					  	'multi'			: true,
+			      		'onAllComplete': function(event, data) { jQuery('#guideme').html('Upload complete! <b>Add more or click the button that says Process Files!</b>'); jQuery('#uploadcomplete').show(); },
 						'onError': function (a, b, c, d) {
 							if (d.status == 404)
 								alert('Could not find upload script. Use a path relative to: '+'<?= getcwd() ?>');
@@ -271,7 +268,7 @@
 			$div->setAttribute('class', 'fileUploadQueue');
 			
 			$queue = new XMLElement('a');
-			$queue->setAttribute('href', "javascript:$('#fileInput').fileUploadClearQueue();");
+			$queue->setAttribute('href', "javascript:jQuery('#fileInput').uploadifyClearQueue();");
 			$queue->setValue('Clear Queue');
 
 			$fieldset->appendChild($p);
@@ -281,8 +278,9 @@
 			$fieldset->appendChild($queue);
 
 			/* now the section fields */
+			$hidden = Widget::Input(General::sanitize($_GET['source']),'', 'hidden');
 			$submit = Widget::Input('action[save]','Process files','button', array('accesskey' => 's'));
-			$submit->setAttribute('onClick', "window.location='".$this->_uri."/do'");
+			$submit->setAttribute('onClick', "window.location='".$this->_uri."/do?source=".General::sanitize($_GET['source'])."'");
 			$actions = new XMLElement('div');
 			$actions->setAttribute('class', 'actions');
 			$div = new XMLElement('div');
@@ -354,7 +352,7 @@
 				foreach ($s as $f) if (in_array($f->get('type'),$this->_driver->getTypes())) $go = true;
 				if ($go) {
 					$field_groups[$section->get('id')] = array('fields' => $section->fetchFields(), 'section' => $section);
-					$options[0]['options'][] = array($section->get('id'), ($_POST['fields']['source'] == $section->get('id')), $section->get('name'));
+					$options[0]['options'][] = array($section->get('id'), (isset ($_GET['source']) ? $_GET['source'] == $section->get('handle') : $_POST['fields']['source'] == $section->get('id')), $section->get('name'));
 				}
 			}
 			$label->appendChild(Widget::Select('fields[source]', $options, array('id' => 'context')));

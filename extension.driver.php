@@ -27,32 +27,22 @@
 		}
 		
 		public function install() {
-			if (file_exists(WORKSPACE.$this->upload)) return true;
-			try {
-				if (!General::realiseDirectory(WORKSPACE.$this->upload, intval('0755', 8))) {
-				}
-			}
-			catch(Exception $e) {
-				if(isset(Administration::instance()->Page)){
-					Administration::instance()->Page->pageAlert('Couldn\'t create '.WORKSPACE.'/uploads/mui directory, chmod this folder to 777.', Alert::ERROR);
-				}
-				return false;
-			}
-			return true;
+			return $this->setupFolder();
 		}
 		
 		public function getSubscribedDelegates() {
 			return array(
 				array(
-					'page'		=> '/system/inject/',
-					'delegate'	=> 'AddCustomPreferenceFieldsets',
-					'callback'	=> 'inject'
+					'page'          => '/system/inject/',
+					'delegate'      => 'AddCustomPreferenceFieldsets',
+					'callback'      => 'inject'
 				),
-	      array(
-       	 	'page'    => '/backend/',
-	        'delegate'  => 'AdminPagePreGenerate',
-	        'callback'  => 'initaliseAdminPageHead'
-      ));
+		      	array(
+	       	 		'page'    => '/backend/',
+		        	'delegate' => 'AdminPagePreGenerate',
+		        	'callback' => 'initaliseAdminPageHead'
+	      		),
+			);
 		}
 
 		
@@ -66,17 +56,42 @@
 			);
 		}
 		
-    public function initaliseAdminPageHead($context) {
-      $page = $context['parent']->Page;
-      if ($page instanceof contentExtensionMassuploadUtilityInject and $page->_context['page'] != 'do') {      
-        $page->addStylesheetToHead(URL . '/extensions/massuploadutility/assets/uploadify.css', 'screen', 100100991);
-        $page->addScriptToHead(URL . '/extensions/massuploadutility/assets/jquery.uploadify.js',100100992);
-      }
-      
-    }			
+		public function addMUUButton($context) {
+			
+			$context->Form->appendChild('hello', Widget::Anchor(__('Create many entries'), Administration::instance()->getCurrentPageURL().'new/'.($filter ? '?prepopulate['.$filter.']=' . $filter_value : ''), __('Create a new entry'), 'create button', NULL, array('accesskey' => 'c')));
+		}
+		
+		public function initaliseAdminPageHead($context) {
+			$page = $context['parent']->Page;
+			if ($page instanceof contentPublish and $page->_context['page'] == 'index') {
+				$page->Form->prependChild(Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject?source='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
+			}
+			if ($page instanceof contentExtensionMassuploadUtilityInject and $page->_context['page'] != 'do') {      
+				$page->addStylesheetToHead(URL . '/extensions/massuploadutility/assets/uploadify.css', 'screen', 100100991);
+				$page->addScriptToHead(URL . '/extensions/massuploadutility/assets/jquery.uploadify.v2.1.4.min.js',100100992);
+				$page->addScriptToHead(URL . '/extensions/massuploadutility/assets/swfobject.js',100100993);
+			}
+
+		}	
+		
 	/*-------------------------------------------------------------------------
 		Utility functions:
 	-------------------------------------------------------------------------*/
+		public function setupFolder() {
+			if (file_exists(WORKSPACE.$this->upload)) return true;
+			try {
+				General::realiseDirectory(WORKSPACE.$this->upload, intval('0755', 8));
+			}
+			catch(Exception $e) {
+				if(isset(Administration::instance()->Page)){
+					Administration::instance()->Page->pageAlert('Couldn\'t create '.WORKSPACE.'/uploads/mui directory, chmod the workspace folder to 777.', Alert::ERROR);
+				}
+				return false;
+			}
+			return true;	
+		}
+	
+	
 		public function getMUI() {
 			return $this->upload;
 		}
