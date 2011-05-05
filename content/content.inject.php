@@ -75,6 +75,7 @@
 		function __actionDo(){
 			if (!isset($_POST['fields']['source']) or $_POST['fields']['source'] <= 0)
 				{ $this->_errors[] = 'You didn\'t choose a source, perhaps you don\'t have any sections with an upload field in them?'; $this->_valid = false; return; }
+			// hardcoded, needs fixed
 			if (!isset($_POST['fields']['sourcedir']) or !preg_match('/^\/workspace\/uploads\/mui/i', $_POST['fields']['sourcedir']))
 				{ $this->_errors[] = 'Fail!'; $this->_valid = false; return; }
 			

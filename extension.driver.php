@@ -67,7 +67,7 @@
 				$sectionManager = new SectionManager($this->_Parent);
 				$section = $sectionManager->fetch($sectionManager->fetchIDFromHandle($page->_context['section_handle']));
 				foreach ($section->fetchFields() as $f) if (in_array($f->get('type'),$this->getTypes())) {
-					$page->appendSubHeading(__('Add Many'), Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject?source='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
+					$page->appendSubHeading(__(''), Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject?source='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
 					// $page->Form->prependChild(Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject?source='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
 				}				
 			}
