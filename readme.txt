@@ -30,12 +30,21 @@ Installation
 Usage
 -------------------------------------------------------------------------------
 
-1.  View the System > Add Multiple Files page to jam a bunch of files into a
+There are two ways:
+
+A)
+1a. Go to the index of a section with a supported field (currently only the upload)
+2a. Upload the files, click the button that says 'Process Files'
+3a. Choose default values if necessary, then click Process files, and if successful
+  you will be redirected to the index. I still need to add a notification.
+
+
+
+B)
+1b.  View the System > Mass Upload Utility page to jam a bunch of files into a
   section.
-
-2.  Upload Files
-
-3.  Click the button that says 'Process'
+2b.  Upload Files
+3b.  Click the button that says 'Process'
 
 
 TROUBLESHOOTING
