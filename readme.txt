@@ -23,6 +23,7 @@ CHANGELOG
 v2.2.1.0
 * now uses native html5 uploader, this won't work with a lot of files though
 * removed navigation item 
+* should now work with any upload field
 
 Installation
 -------------------------------------------------------------------------------
