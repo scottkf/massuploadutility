@@ -5,9 +5,6 @@
 		Definition:
 	-------------------------------------------------------------------------*/
 		
-		protected $upload = '/uploads/mui';
-		protected $supported_types = array('upload');
-
 		public function about() {
 			return array(
 				'name'			=> 'Mass Upload Utility',
@@ -27,7 +24,6 @@
 		}
 		
 		public function install() {
-			return $this->setupFolder($this->upload);
 		}
 		
 		public function getSubscribedDelegates() {
@@ -46,15 +42,7 @@
 		}
 
 		
-		public function fetchNavigation() {
-			return array(
-				array(
-					'location'	=> 200,
-					'name'	=> 'Mass Upload Utility',
-					'link'	=> '/inject/'
-				)
-			);
-		}
+
 		
 		public function addMUUButton($context) {
 			
@@ -66,16 +54,14 @@
 			if ($page instanceof contentPublish and $page->_context['page'] == 'index') {
 				$sectionManager = new SectionManager($this->_Parent);
 				$section = $sectionManager->fetch($sectionManager->fetchIDFromHandle($page->_context['section_handle']));
-				foreach ($section->fetchFields() as $f) if (in_array($f->get('type'),$this->getTypes())) {
-					$page->appendSubHeading(__(''), Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject?source='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
+				foreach ($section->fetchFields() as $f) 
+					if ($this->supportedField($f->get('element_name'))) {
+					$page->appendSubHeading(__(''), Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject/do?MUUsource='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
 					// $page->Form->prependChild(Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject?source='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
 				}				
 			}
 			if ($page instanceof contentExtensionMassuploadUtilityInject and $page->_context['page'] != 'do') {      
-				$page->addStylesheetToHead(URL . '/extensions/massuploadutility/assets/uploadify.css', 'screen', 100100991);
-				$page->addScriptToHead(URL . '/extensions/massuploadutility/assets/jquery-1.4.2.min.js',100100990);
-				$page->addScriptToHead(URL . '/extensions/massuploadutility/assets/jquery.uploadify.v2.1.4.min.js',100100992);
-				$page->addScriptToHead(URL . '/extensions/massuploadutility/assets/swfobject.js',100100993);
+				$page->addScriptToHead(URL . '/extensions/massuploadutility/assets/jquery.html5_upload.js',100100990);
 			}
 
 		}	
@@ -83,28 +69,11 @@
 	/*-------------------------------------------------------------------------
 		Utility functions:
 	-------------------------------------------------------------------------*/
-		public function setupFolder($path) {
-			// this is wrong for setting up the original page
-			if (file_exists(WORKSPACE.$path)) return true;
-			try {
-				General::realiseDirectory(WORKSPACE.$path, intval('0755', 8));
-			}
-			catch(Exception $e) {
-				if(isset(Administration::instance()->Page)){
-					Administration::instance()->Page->pageAlert('Couldn\'t create '.WORKSPACE.$path.' directory, chmod the workspace folder to 777.', Alert::ERROR);
-				}
-				return false;
-			}
-			return true;	
-		}
-	
-	
-		public function getMUI() {
-			return $this->upload;
-		}
-		
-		public function getTypes() {
-			return $this->supported_types;
-		}
+	// supporting everything with upload in it's name, this may or may not work
+	public function supportedField($name) {
+		return preg_match('/upload/',$name);
+	}
+
+
 	}
 ?>

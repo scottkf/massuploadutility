@@ -1,7 +1,7 @@
 Multiple Upload Injector
 -------------------------------------------------------------------------------
 
-Version: 2.2.1
+Version: 2.2.1.0
 Author: Scott Tesoriere <scott@tesoriere.com>
 Build Date: 04 May 2011
 Github Repository: http://github.com/scottkf/massuploadutility/tree/v2.2.1
@@ -17,6 +17,12 @@ Warning: This extension requires the use of shell_exec and copy(). Shell_exec
 for getting the mimetype reliably, and copy to take care of the copying!
 
 
+CHANGELOG
+-------------------------------------------------------------------------------
+
+v2.2.1.0
+* now uses native html5 uploader, this won't work with a lot of files though
+
 Installation
 -------------------------------------------------------------------------------
 
@@ -30,26 +36,17 @@ Installation
 Usage
 -------------------------------------------------------------------------------
 
-There are two ways:
-
-A)
-1a. Go to the index of a section with a supported field (currently only the upload)
-2a. Upload the files, click the button that says 'Process Files'
-3a. Choose default values if necessary, then click Process files, and if successful
-  you will be redirected to the index. I still need to add a notification.
+1. Go to the index of a section with an upload field
+2. Click the button that says 'Add Many'
+3. Choose default values if necessary, then click Process files, and if successful
+  you will be redirected to the index. 
 
 
-
-B)
-1b.  View the System > Mass Upload Utility page to jam a bunch of files into a
-  section.
-2b.  Upload Files
-3b.  Click the button that says 'Process'
-
-
-TODO
+BUGS
 -------------------------------------------------------------------------------
-- Remove the Section listing from the MUU if a source is already chosen
+
+- If you receive an error on the form, you have to select all the files again
+- No notification is received on the index after successful input
 
 
 TROUBLESHOOTING

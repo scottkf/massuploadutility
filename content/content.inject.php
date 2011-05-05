@@ -20,15 +20,12 @@
 
 	class contentExtensionMassUploadUtilityInject extends AdministrationPage {
 		protected $_action = '';
-		protected $_ignored_files = array();
 		protected $_driver = null;
 		protected $_errors = array();
 		protected $_entries_count = '';
 		protected $_uri = null;
 		protected $_valid = false;
-		protected $_section_id = 0;
 		protected $_message = '';
-		protected $_files = array();
 		
 		public function __construct(&$parent){
 			parent::__construct($parent);
@@ -73,107 +70,99 @@
 		}
 		
 		function __actionDo(){
-			if (!isset($_POST['fields']['source']) or $_POST['fields']['source'] <= 0)
-				{ $this->_errors[] = 'You didn\'t choose a source, perhaps you don\'t have any sections with an upload field in them?'; $this->_valid = false; return; }
-			// hardcoded, needs fixed
-			if (!isset($_POST['fields']['sourcedir']) or !preg_match('/^\/workspace\/uploads\/mui/i', $_POST['fields']['sourcedir']))
-				{ $this->_errors[] = 'Fail!'; $this->_valid = false; return; }
-			
 
-			$this->_section_id = $_POST['fields']['source']; // section id
+			if (!isset($_REQUEST['MUUsource']) or $_REQUEST['MUUsource'] == '')
+			{ $this->_message = 'You didn\'t choose a source, perhaps you don\'t have any sections with an upload field in them?'; $this->_valid = false; return; }
+
+			// $fields = $_POST['fields'];
+			$upload_field_name = General::sanitize($_POST['upload_field_name']);
+			if(isset($_FILES['fields'])){
+				$filedata = General::processFilePostData($_FILES['fields']);
+				
+				foreach($filedata as $handle => $data){
+					if(!isset($fields[$handle])) $fields[$handle] = $data;
+					elseif(isset($data['error']) && $data['error'] == 4) $fields['handle'] = NULL;
+					else{
+
+						foreach($data as $ii => $d){
+							if(isset($d['error']) && $d['error'] == 4) $fields[$handle][$ii] = NULL;
+							elseif(is_array($d) && !empty($d)){
+
+								foreach($d as $key => $val)
+									$fields[$handle][$ii][$key] = $val;
+							}
+						}
+					}
+				}
+			}
+
+			if ($fields[$upload_field_name][0][0] == '') {
+				$this->_message = "Please select files to upload."; $this->_valid = false; return; 
+			}
+	
+
+			
+			$sectionManager = new SectionManager($this->_Parent);
+			$section_id = $sectionManager->fetchIDFromHandle(General::sanitize($_REQUEST['MUUsource']));
+			// $this->_section_id = $_POST['fields']['source']; // section id
 			$entryManager = new EntryManager($this->_Parent);
 
 
-			$sectionManager = new SectionManager($this->_Parent);
-	    $section = $sectionManager->fetch($this->_section_id);
 
-			// get all the fields for the types we support, and get ready to put the filename in them
-			foreach ($this->_driver->getTypes() as $type) {
-				$f = $section->fetchFields($type);
-				if (count($f) > 0)
-					foreach ($f as $field) $field_names[] = $field; //array($field->get('element_name'), $field->get('destination'));
-			}
-			$files = General::listStructure(DOCROOT . $_POST['fields']['sourcedir']);
+			if(!$section = $sectionManager->fetch($section_id))
+				Administration::instance()->customError(__('Unknown Section'), __('The Section you are looking, <code>%s</code> for could not be found.', $this->_context['section_handle']));
 
-			if (count($files['filelist']) == 0)
-				{ $this->_errors[] = "There are no files in this directory: {$_POST['fields']['sourcedir']}."; $this->_valid = false; return; }
 
 			// a list of all the entries so we can rollback
 			$entries = array();
-
-			foreach ($files['filelist'] as $k=>$f) {
-				$continue = false;
-				$this->_files[] = $f;
+			
+			foreach ($fields[$upload_field_name] as $v) {
 				$entry =& $entryManager->create();
-				$entry->set('section_id', $this->_section_id);
+				$entry->set('section_id', $section_id);
 				$entry->set('author_id', $this->_Parent->Author->get('id'));
 				$entry->set('creation_date', DateTimeObj::get('Y-m-d H:i:s'));
-				$entry->set('creation_date_gmt', DateTimeObj::getGMT('Y-m-d H:i:s'));
-				$chkfields = $fields = $_POST['fields'][$this->_section_id];
-				// loop over all the supported fields
-				foreach ($field_names as $field) {
-					$dest = $field->get('destination');
-					$name = $field->get('element_name');
-					$tmp_name = DOCROOT . $_POST['fields']['sourcedir'] . '/' . $f;
-					$new_name = DOCROOT . $dest . '/' . $f;
-					/* if you don't want to rollback implement this */
-					// if($field->get('validator') != NULL){
-					//     $rule = $field->get('validator');
-					// 		
-					// 		// skip this file since it doesn't validate
-					//     if(!General::validateString($tmp_name, $rule)) {
-					// 			;
-					// 			// $continue = true;
-					// 		}
-					// }
-					$type = trim(shell_exec('file -b --mime '.escapeshellarg($tmp_name)));
-					$size = filesize($tmp_name);
-
-					// setup fields to check the post
-					$chkfields[$name][name] = $f;
-					$chkfields[$name][type] = $type;
-					$chkfields[$name][tmp_name] = $tmp_name;
-					$chkfields[$name][error] = 0;
-					$chkfields[$name][size] = $size;
-					
-					// an array to copy the files after
-					$copy[] = array($tmp_name, $new_name);
-
-					// setup upload fields as they should be as if they were processed
-					$fields[$name][file] = preg_replace("/^\/workspace/", '', $dest) . '/' . $f;
-					$fields[$name][size] = $size;
-					$fields[$name][mimetype] = $type;
-					$fields[$name][meta] = serialize($this->getMetaInfo($tmp_name, $type));
-				}
-
-				// skip the file if it doesn't validate
-				// if ($continue == true) continue;
-				if(__ENTRY_FIELD_ERROR__ == $entry->checkPostData($chkfields, $this->_errors))
-				{ $this->_ignored_files[] = $f; break; }
-
-				// now we can copy the files to their new location since everything's validated
-				foreach ($copy as $c) {
-					if (@copy($c[0], $c[1])) {
-						@chmod($c[1], intval(0755, 8));
+				$entry->set('creation_date_gmt', DateTimeObj::getGMT('Y-m-d H:i:s'));				
+				
+				foreach ($_POST['fields'] as $k=>$val) {
+					if ($upload_field_name != $k) {
+						$nfields[$k] = $val;
 					}
-					else { $this->_errors[] = "Couldn't copy the files to the {$dest} directory. "; return; }
 				}
+				$nfields[$upload_field_name]['name'] = $v[0];
+				$nfields[$upload_field_name]['type'] = $v[1];
+				$nfields[$upload_field_name]['tmp_name'] = $v[2];
+				$nfields[$upload_field_name]['error'] = $v[3];
+				$nfields[$upload_field_name]['size'] = $v[4];
+			
+				if(__ENTRY_FIELD_ERROR__ == $entry->checkPostData($nfields, $error))
+				{ $this->_errors[key($error)] = $error[key($error)]; break; }
 
 				// setup the data, process it
-				if(__ENTRY_OK__ != $this->setDataFromPost($entry, $fields, $this->_errors, false, false, $entries))
-				{ $this->_ignored_files[] = $f; break; }
+				// if(__ENTRY_OK__ != $this->setDataFromPost($entry, $fields, $this->_errors, false, false, $entries))
+				elseif(__ENTRY_OK__ != $entry->setDataFromPost($nfields, $error)) {
+					$this->_errors[] = $error['message'];
+					// $this->pageAlert($error['message'], Alert::ERROR);
+					break; 
+				}
+				Symphony::ExtensionManager()->notifyMembers('EntryPreCreate', '/publish/new/', array('section' => $section, 'entry' => &$entry, 'fields' => &$nfields));
 
 				// commit the entry if we made it
 				if(!$entry->commit()){
 					define_safe('__SYM_DB_INSERT_FAILED__', true);
+					$this->pageAlert(NULL, Alert::ERROR);
 				}
 				else
 				{
+					// keep track of it if it was inserted
+					$entries[] = $entry->get('id');
 					$this->_valid = true;
-					$this->_Parent->ExtensionManager->notifyMembers('EntryPostCreate', '/publish/new/', array('section' => $section, 'fields' => &$values, 'entry' => &$entry));
+					Symphony::ExtensionManager()->notifyMembers('EntryPostCreate', '/publish/new/', array('section' => $section, 'entry' => $entry, 'fields' => $nfields));
 				}
 
 			}
+			
+
+
 
 			// rollback, delete all entries by id
 			if ($this->_valid == false && count($entries) > 0) {
@@ -181,20 +170,8 @@
 				$entryManager->delete($entries);
 				return;
 			}
-			// if we made it here, and they want us to delete the files, it shall beDOCROOT . $_POST['fields']['sourcedir']
-			if (isset($_POST['fields']['remove']) && 
-					$_POST['fields']['remove'] == 'on' && 
-					$this->_valid == true) {
-				foreach ($files['filelist'] as $k=>$f)
-					unlink(DOCROOT . $_POST['fields']['sourcedir'].'/'.$f);
 
-				// already sanitized the sourcedir so no one can accidentally delete stuff 
-				// 	from anywhere but the uploads directory, make sure not to delete mui dir
-				if ($_POST['fields']['sourcedir'] != '/workspace'.$this->_driver->getMUI()) {
-					rmdir(DOCROOT . $_POST['fields']['sourcedir']);
-				}
-			}
-			$this->_entries_count = count($files['filelist']) - count($this->_ignored_files);
+			$this->_entries_count = count($fields[$upload_field_name]);
 			
 		}
 		
@@ -207,108 +184,18 @@
 			$this->__viewIndex();
 		}
 		public function __viewIndex() {
-			$this->setPageType('form');
-			$this->Form->setAttribute('enctype', 'multipart/form-data');
-			$this->setTitle('Symphony &ndash; Add Multiple Files From a Folder');
-			$this->appendSubheading('Upload!');
 
-			$fieldset = new XMLElement('fieldset');
-			$fieldset->setAttribute('class', 'settings');
-			$fieldset->appendChild(new XMLElement('legend', 'Essentials'));
-			$p = new XMLElement('p');
-			$p->setAttribute('id', 'guideme');
-			$p->setValue('Upload some files to the <em>'.General::sanitize($_GET['source']).'</em> section. They will be put under a directory named: <b>/workspace'.$this->_driver->getMUI().'/'.date('Y-m-d').'.</b>');
-
-			$fileinput = new XMLElement('div');
-			$fileinput->setAttribute('id', 'fileInput');
-
-			$input = Widget::Input('fileInput', null, 'file');
-			$input->setAttribute('style', 'display:none');
-			$input->setAttribute('height', '30');
-			$input->setAttribute('width', '110');
-			$input->setAttribute('id', 'fileInput');
-			
-			$script = new XMLElement('script');
-			$script->setAttribute("type", 'text/javascript');
-			$folder_name = date("Y-m-d");
-			$path = preg_replace('/^http\:\/\/.*\//i', '', URL);
-			if (preg_match('/http\:\/\//i', $path)) $path = '';
-			$this->_driver->setupFolder($this->_driver->getMUI().'/'.$folder_name);
-			// echo $path;
-			// echo WORKSPACE.$this->upload.'/'.$folder_name;
-			// echo $_SERVER['DOCUMENT_ROOT']."/".$path."/workspace".$this->_driver->getMUI()."/".$folder_name;
-			// echo $folder_name;
-			// print_r((($path != '') ? '/'.$path : '')."/workspace".$this->_driver->getMUI()."/".$folder_name);
-			// print_r(WORKSPACE.$this->_driver->getMUI()."/".$folder_name);
-			$js = "
-				jQuery(document).ready(function() {
-					jQuery('#fileInput').uploadify ({
-						'uploader'  : '".URL."/extensions/massuploadutility/assets/uploadify.swf',
-						'script'    : '".(($path != '') ? '/'.$path : '')."/extensions/massuploadutility/assets/uploadify.php',
-						'cancelImg' : '".URL."/extensions/massuploadutility/assets/cancel.png',
-						'auto'      : true,
-					  	'displayData': 'speed',
-					  	'simUploadLimit': 2,
-						'folder'    : '".(($path != '') ? '/'.$path : '')."/workspace".$this->_driver->getMUI()."/".$folder_name."',
-					  	'multi'		: true,
-			      		'onAllComplete': function(event, data) { 
-							jQuery('#guideme').html('Upload complete! <b>Add more or click the button that says Process Files!</b>'); 
-							jQuery('#uploadcomplete').show(); },
-						'onError': function (a, b, c, d) {
-							if (d.status == 404)
-								alert('Could not find upload script. Use a path relative to: '+'<?= getcwd() ?>');
-							else if (d.type === \"HTTP\")
-								alert('error '+d.type+\": \"+d.status);
-							else if (d.type ===\"File Size\")
-								alert(c.name+' '+d.type+' Limit: '+Math.round(d.sizeLimit/1024)+'KB');
-							else
-								alert('error '+d.type+\": \"+d.text);
-							return false;
-						}
-					});
-				});
-				";
-			$script->setValue($js);
-			
-			$div = new XMLElement('div');
-			$div->setAttribute('id', 'fileInputQueue');
-			$div->setAttribute('class', 'fileUploadQueue');
-			
-			$queue = new XMLElement('a');
-			$queue->setAttribute('href', "javascript:jQuery('#fileInput').uploadifyClearQueue();");
-			$queue->setValue('Clear Queue');
-
-			$fieldset->appendChild($p);
-			$fieldset->appendChild($fileinput);
-			$fieldset->appendChild($script);
-			$fieldset->appendChild($div);
-			$fieldset->appendChild($queue);
-
-			/* now the section fields */
-			$hidden = Widget::Input(General::sanitize($_GET['source']),'', 'hidden');
-			$submit = Widget::Input('action[save]','Process files','button', array('accesskey' => 's'));
-			$submit->setAttribute('onClick', "window.location='".$this->_uri."/do?source=".General::sanitize($_GET['source'])."'");
-			$actions = new XMLElement('div');
-			$actions->setAttribute('class', 'actions');
-			$div = new XMLElement('div');
-			$div->setAttribute('class', 'uploadcomplete');
-			$div->setAttribute('id', 'uploadcomplete');
-			$div->setAttribute('style', 'display:none');
-			$actions->appendChild($submit);
-			$div->appendChild($actions);
-
-			$this->Form->appendChild($fieldset);
-			$this->Form->appendChild($div);
 		}
 		
 		/* main page */
 
 		public function __viewDo() {
-			if (count($_POST) > 0 && count($this->_errors) > 0) {
+			if ((count($_POST) > 0 && count($this->_errors) > 0) || $this->_message != '') {
 				if (is_array($this->_errors)) {
+					// print_r($this->_errors);
 					$this->pageAlert("
-						An error occurred while processing this form.
-						<a href=\"#error\">".$this->parseErrors()." Rolling back.</a>",
+						An error occurred while processing this form. ".($this->_message != '' ? $this->_message: "See below for details.").
+						"<a href=\"#error\">Rolling back.</a>",
 						Alert::ERROR);
 				}
 			}
@@ -318,123 +205,108 @@
 					To do it again, <a href=\"{$this->_uri}/\">Give it another go below.</a>",
 					Alert::SUCCESS, 
 					array('created', URL, 'extension/multipleuploadinjector'));
-				redirect(SYMPHONY_URL . '/publish/'.General::sanitize($_REQUEST['redirect_to']));
+				redirect(SYMPHONY_URL . '/publish/'.General::sanitize($_REQUEST['MUUsource']));
 			}
 			
 			$this->setPageType('form');
 			$this->Form->setAttribute('enctype', 'multipart/form-data');
 			$this->setTitle('Symphony &ndash; Add Multiple Files From a Folder');
 
-			// // Edit:
-			// if ($this->_action == 'edit')	{
-			// 	if (!$this->_valid && count($this->_errors) == 0)
-			// 		if (count($this->_files) > 0) {
-			// 			$this->appendSubHeading('Added '.implode(', ',$this->_files));
-			// 		}
-			// }
-			// else 
-				$this->appendSubheading('Inject!');
+
+			$this->appendSubheading('Inject some files into the <strong>'.General::sanitize($_REQUEST['MUUsource']).'</strong> section!');
+
+
+			
+			// $script = new XMLElement('script');
+			// $script->setAttribute("type", 'text/javascript');
+			// $js = '
+			// jQuery(document).ready(function() {
+			// 	                    jQuery("#upload_field").html5_upload({
+			// 	                            url: function(number) {
+			// 	                                    return prompt(number + " url", "/");
+			// 	                            },
+			// 	                            sendBoundary: window.FormData || $.browser.mozilla,
+			// 	                            onStart: function(event, total) {
+			// 	                                    return confirm("You are trying to upload " + total + " files. Are you sure?");
+			// 	                            },
+			// 	                            setName: function(text) {
+			// 	                                            jQuery("#progress_report_name").text(text);
+			// 	                            },
+			// 	                            setStatus: function(text) {
+			// 	                                    jQuery("#progress_report_status").text(text);
+			// 	                            },
+			// 	                            setProgress: function(val) {
+			// 	                                    jQuery("#progress_report_bar").css(\'width\', Math.ceil(val*100)+"%");
+			// 	                            },
+			// 	                            onFinishOne: function(event, response, name, number, total) {
+			// 	                                    //alert(response);
+			// 	                            }
+			// 	                    });
+			// 	            });
+			// 	';
+			// $script->setValue($js);
+
 
 			$fieldset = new XMLElement('fieldset');
 			$fieldset->setAttribute('class', 'settings');
-			$fieldset->appendChild(new XMLElement('legend', 'Essentials'));
-
-			$div = new XMLElement('div');
-			$div->setAttribute('class', 'group');
-			$label = Widget::Label(__('Source (where these are all going)'));	
-			
-			$sectionManager = new SectionManager($this->_Parent);
-	    $sections = $sectionManager->fetch();
-			$options[0]['label'] = 'Sections';
-			foreach($sections as $section) { 
-				$s = $section->fetchFields();
-				$go = false;
-				foreach ($s as $f) if (in_array($f->get('type'),$this->_driver->getTypes())) $go = true;
-				if ($go) {
-					$field_groups[$section->get('id')] = array('fields' => $section->fetchFields(), 'section' => $section);
-					$options[0]['options'][] = array($section->get('id'), (isset ($_GET['source']) ? $_GET['source'] == $section->get('handle') : $_POST['fields']['source'] == $section->get('id')), $section->get('name'));
-				}
-			}
-			$label->appendChild(Widget::Select('fields[source]', $options, array('id' => 'context')));
-			$div->appendChild($label);
-
-			$label = Widget::Label(__('Directory where images are stored'));
-			$options = array();
-			$options[] = array('/workspace'.$this->_driver->getMUI(), false, '/workspace'.$this->_driver->getMUI());
-			$ignore = array('events', 'data-sources', 'text-formatters', 'pages', 'utilities');
-                        $directories = General::listDirStructure(WORKSPACE . $this->_driver->getMUI(), null, true, DOCROOT, $ignore);			
-			if(!empty($directories) && is_array($directories)){
-				foreach($directories as $d) {
-					$d = '/' . trim($d, '/');
-					if(!in_array($d, $ignore)) $options[] = array($d, ($d == '/workspace'.$this->_driver->getMUI().'/'.date('Y-m-d')) ? true : false, $d);
-				}	
-			}
-
-			$label->appendChild(Widget::Select('fields[sourcedir]', $options));
-			$div->appendChild($label);
-			$fieldset->appendChild($div);
-
-			$div = new XMLElement('div');
-			$div->setAttribute('class', 'group');
-			$label = Widget::Label(__('Delete directory and contents after successful import?'));
-			$label->appendChild(Widget::Input('fields[remove]', null, 'checkbox'));
-			$div->appendChild($label);
-			$fieldset->appendChild($div);
-
-			
-			$this->Form->appendChild($fieldset);
+			// $this->Form->appendChild($fieldset);
 			/* now the section fields */
-			$fieldset = new XMLElement('fieldset');
-			$fieldset->setAttribute('class', 'settings contextual ' . __('sections') . ' ' . __('authors') . ' ' . __('navigation') . ' ' . __('Sections') . ' ' . __('System'));
+			// $fieldset->setAttribute('class', 'settings contextual ' . __('sections') . ' ' . __('authors') . ' ' . __('navigation') . ' ' . __('Sections') . ' ' . __('System'));
 			$fieldset->appendChild(new XMLElement('legend', __('Choose Default Values')));
 
 
 			$entryManager = new EntryManager($this->_Parent);
+			$sectionManager = new SectionManager($this->_Parent);
 
-			foreach($field_groups as $section_id => $section_data){	
+			$section = $sectionManager->fetch($sectionManager->fetchIDFromHandle(General::sanitize($_REQUEST['MUUsource'])));
+			$s = $section->fetchFields();
 
-				// create a dummy entry
-				$entry = $entryManager->create();
-				$entry->set('section_id', $section_id);
-				$div = new XMLElement('div');
-				$div->setAttribute('class', 'contextual ' . $section_id);
+			// create a dummy entry
+			$entry = $entryManager->create();
+			$entry->set('section_id', $section->get('id'));
 				
 				
-				$primary = new XMLElement('fieldset');
-				$primary->setAttribute('class', 'primary');
+			$this->Form->appendChild($fieldset);
+				
+			$primary = new XMLElement('fieldset');
+			$primary->setAttribute('class', 'primary');
+			$sidebar_fields = $section->fetchFields(NULL, 'sidebar');
+			$main_fields = $section->fetchFields(NULL, 'main');
 
-				$sidebar_fields = $section_data['section']->fetchFields();
-				// $main_fields = $section_data['section']->fetchFields(NULL, 'main');
+			if ((!is_array($main_fields) || empty($main_fields)) && (!is_array($sidebar_fields) || empty($sidebar_fields))) {
+				$primary->appendChild(new XMLElement('p', __(
+					'It looks like you\'re trying to create an entry. Perhaps you want fields first? <a href="%s">Click here to create some.</a>',
+					array(
+						SYMPHONY_URL . '/blueprints/sections/edit/' . $section->get('id') . '/'
+					)
+				)));
+				$this->Form->appendChild($primary);
+			}
 
-				// if(is_array($main_fields) && !empty($main_fields)){
-				// 	foreach($main_fields as $field){
-				// 		if (!in_array($field->get('type'),$this->_driver->getTypes()))
-				// 			$primary->appendChild($this->__wrapFieldWithDiv($field));
-				// 	}
-				// 	$div->appendChild($primary);
-				// }
-
-				if(is_array($sidebar_fields) && !empty($sidebar_fields)){
-					$sidebar = new XMLElement('fieldset');
-					$sidebar->setAttribute('class', 'primary');
-
-					foreach($sidebar_fields as $field){
-						if (!in_array($field->get('type'),$this->_driver->getTypes())) 
-							$sidebar->appendChild($this->__wrapFieldWithDiv($field, $entry, $section_id, null, null));
+			else {
+				if (is_array($main_fields) && !empty($main_fields)) {
+					foreach ($main_fields as $field) {
+							$primary->appendChild($this->__wrapFieldWithDiv($field, $entry));
 					}
 
-					$div->appendChild($sidebar);
-				}				
+					$this->Form->appendChild($primary);
+				}
 
-				
-				
-				$fieldset->appendChild($div);
-				
-				
+				if (is_array($sidebar_fields) && !empty($sidebar_fields)) {
+					$sidebar = new XMLElement('fieldset');
+					$sidebar->setAttribute('class', 'secondary');
+
+					foreach ($sidebar_fields as $field) {
+						 $sidebar->appendChild($this->__wrapFieldWithDiv($field, $entry));
+					}
+
+					$this->Form->appendChild($sidebar);
+				}
 			}
 			
-			$this->Form->appendChild($fieldset);
-			$hidden = Widget::Input('redirect_to', General::sanitize($_GET['source']), 'hidden');
+			
+
+			$hidden = Widget::Input('MUUsource', General::sanitize($_REQUEST['MUUsource']), 'hidden');
 			$submit = Widget::Input('action[save]','Process files','submit', array('accesskey' => 's'));
 			$div = new XMLElement('div');
 			$div->setAttribute('class', 'actions');
@@ -449,108 +321,62 @@
 	
 	
 		
-		private function __wrapFieldWithDiv(Field $field, Entry $entry, $prefix = null, $postfix = null, $css = null){
-			$div = new XMLElement('div', NULL, array('class' => 'field field-'.$field->handle().($field->get('required') == 'yes' ? ' required' : '')));
+		private function __wrapFieldWithDiv(Field &$field, Entry &$entry, $prefix = null, $postfix = null, $css = null){
+			$div = new XMLElement('div', NULL, array('id' => 'field-' . $field->get('id'), 'class' => 'field field-'.$field->handle().($field->get('required') == 'yes' ? ' required' : '')));
 			if ($css != null) $div->setAttribute('style', $css);
-			$field->displayPublishPanel(
-				$div, $_POST['fields'][$field->get('element_name')],
-				(isset($this->_errors[$field->get('id')]) ? $this->_errors[$field->get('id')] : NULL),
-				$prefix ? '['.$prefix.']' : null,
-				null, (is_numeric($entry->get('id')) ? $entry->get('id') : NULL)
-			);
+			$value = array("value" => $_POST['fields'][$field->get('element_name')]);
+			if (!$this->_driver->supportedField($field->get('element_name'))) {
+				// print_r($_POST['fields'][$field->get('element_name')]);
+				$field->displayPublishPanel(
+					$div, $value,
+					(isset($this->_errors[$field->get('id')]) ? $this->_errors[$field->get('id')] : NULL),
+					$prefix ? '['.$prefix.']' : null,
+					null, (is_numeric($entry->get('id')) ? $entry->get('id') : NULL)
+				);
+			}
+			else {
+				$fileInput = new XMLElement('input');
+				$fileInput->setAttribute("multiple", "multiple");
+				$fileInput->setAttribute("id", "upload_field");
+				$fileInput->setAttribute("type", "file");
+				$fileInput->setAttribute("name", "fields[".$field->get('element_name')."][]");
+				$progress = new XMLElement('div');
+				$progress->setAttribute('id', 'progress_report');
+				$progress_name = new XMLElement('div');
+				$progress_name->setAttribute('id', 'progress_report_name');
+				$progress_status = new XMLElement('div');
+				$progress_status->setAttribute('id', 'progress_report_status');
+				$progress_container = new XMLElement('div');
+				$progress_container->setAttribute('id', 'progress_report_bar_container');
+				$progress_bar = new XMLElement('div');
+				$progress_bar->setAttribute('id', 'progress_report_bar');
+
+				$progress_container->appendChild($progress_bar);
+				$progress->appendChild($progress_name);
+				$progress->appendChild($progress_status);
+				$progress->appendChild($progress_container);
+
+				$hidden = Widget::Input('upload_field_name', $field->get('element_name'), 'hidden');
+
+
+				$span = new XMLElement('span', NULL, array('class' => 'frame'));
+				$label = Widget::Label($field->get('label'));
+				$class = 'file';
+				$label->setAttribute('class', $class);
+				if($field->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
+				$span->appendChild($fileInput);
+				$span->appendChild($progress);
+
+				$label->appendChild($span);
+				$div->appendChild($label);
+				$div->appendChild($hidden);
+			}
 			return $div;
 		}
 
-		private function setDataFromPost($entry, $data, &$error, $simulate=false, $ignore_missing_fields=false, &$entries){
-			$error = NULL;
-			
-			$status = __ENTRY_OK__;
-			// Entry has no ID, create it:
-			if(!$entry->get('id') && $simulate == false) {
-				$entry->assignEntryId();
-				/* older 
-				$entry->_engine->Database->insert($entry->get(), 'tbl_entries');
-				if(!$entry_id = $entry->_engine->Database->getInsertID()) return __ENTRY_FIELD_ERROR__;
-				$entry->set('id', $entry_id); */
-			}			
 
-			$SectionManager = new SectionManager($this->_Parent);
-			$EntryManager = new EntryManager($this->_Parent);
-			$section = $SectionManager->fetch($entry->get('section_id'));
-			$schema = $section->fetchFieldsSchema();
-
-			foreach($schema as $info){
-				$result = NULL;
-				$field = $EntryManager->fieldManager->fetch($info['id']);
-
-				if($ignore_missing_fields && !isset($data[$field->get('element_name')])) continue;
-				if (!in_array($field->get('type'),$this->_driver->getTypes())) {
-					$result = $field->processRawFieldData(
-						(isset($data[$info['element_name']]) ? $data[$info['element_name']] : NULL), $s, $m, false, $entry->get('id')
-					);
-
-					if($s != Field::__OK__){
-						$status = __ENTRY_FIELD_ERROR__;
-						$error = array('field_id' => $info['id'], 'message' => $m);
-					}
-				} 
-				else 
-				{ $status = __ENTRY_OK__; $result = $data[$field->get('element_name')]; }
-				
-
-				$entry->setData($info['id'], $result);
-			}
-
-			if($status != __ENTRY_OK__ and !is_null($entry_id)) {
-				$entry->_engine->Database->delete('tbl_entries', " `id` = '$entry_id' ");
-			}
-			$entries[] = $entry_id;
-			return $status;
-		}
-
-		public static function getMetaInfo($file, $type){
-
-			$imageMimeTypes = array(
-				'image/gif',
-				'image/jpg',
-				'image/jpeg',
-				'image/png',
-			);
-			
-			$meta = array();
-			
-			$meta['creation'] = DateTimeObj::get('c', time());
-			
-			if(in_array($type, $imageMimeTypes) && $array = @getimagesize($file)){
-				$meta['width']    = $array[0];
-				$meta['height']   = $array[1];
-			}
-			
-			return $meta;
-			
-		}
 		
 		public function parseErrors() {
-			if (is_array($this->_errors)) {
-				foreach ($this->_errors as $k=>$v) {
-					if (preg_match("/File Chosen in \'.*\' does not match allowable file types for that field/i", $v)) {
-						$a = 'File \''.implode(', ', $this->_ignored_files).'\' does not match allowable filetypes for that fields. Please remove this file and try again.';
-						return $a;
-					} else if (!preg_match('/required/i', $v)) {
-						return $v; 
-					}
-					// } else if (preg_match('/A file with the name/i', $v)) {
-					// 	return $v;
-					// } else if (preg_match('/There are no files/i', $v)) {
-					// 	return $v;
-					// } else if (preg_match('/^Fail/i', $v)) {
-					// 	return $v;
-					// } else if (preg_match('/You didn\'t choose a source/i', $v)) {
-					// 	return $v;
-					// } else if (preg_match('/Destination folder .* is not writable/i', $v)) {
-					// 	return $v;
-				}
-			}
 		}
 
 	}
