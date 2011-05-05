@@ -3,8 +3,8 @@ Multiple Upload Injector
 
 Version: 2.2.1.0
 Author: Scott Tesoriere <scott@tesoriere.com>
-Build Date: 04 May 2011
-Github Repository: http://github.com/scottkf/massuploadutility/tree/v2.2.1
+Build Date: 05 May 2011
+Github Repository: http://github.com/scottkf/massuploadutility/tree/v2.2.1.0
 Requirements: Symphony 2.2.1
 
 If you're using an older version of Symphony, please use v0.9 of the Mass Upload Utility:
@@ -22,6 +22,7 @@ CHANGELOG
 
 v2.2.1.0
 * now uses native html5 uploader, this won't work with a lot of files though
+* removed navigation item 
 
 Installation
 -------------------------------------------------------------------------------
@@ -47,7 +48,7 @@ BUGS
 
 - If you receive an error on the form, you have to select all the files again
 - No notification is received on the index after successful input
-
+- If more than one upload field is in a section, this will fail
 
 TROUBLESHOOTING
 -------------------------------------------------------------------------------
