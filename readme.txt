@@ -47,6 +47,11 @@ B)
 3b.  Click the button that says 'Process'
 
 
+TODO
+-------------------------------------------------------------------------------
+- Remove the Section listing from the MUU if a source is already chosen
+
+
 TROUBLESHOOTING
 -------------------------------------------------------------------------------
 
