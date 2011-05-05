@@ -232,11 +232,13 @@
 			$folder_name = date("Y-m-d");
 			$path = preg_replace('/^http\:\/\/.*\//i', '', URL);
 			if (preg_match('/http\:\/\//i', $path)) $path = '';
-			$this->_driver->setupFolder();
+			$this->_driver->setupFolder($this->_driver->getMUI().'/'.$folder_name);
 			// echo $path;
 			// echo WORKSPACE.$this->upload.'/'.$folder_name;
 			// echo $_SERVER['DOCUMENT_ROOT']."/".$path."/workspace".$this->_driver->getMUI()."/".$folder_name;
 			// echo $folder_name;
+			// print_r((($path != '') ? '/'.$path : '')."/workspace".$this->_driver->getMUI()."/".$folder_name);
+			// print_r(WORKSPACE.$this->_driver->getMUI()."/".$folder_name);
 			$js = "
 				jQuery(document).ready(function() {
 					jQuery('#fileInput').uploadify ({
@@ -247,8 +249,10 @@
 					  	'displayData': 'speed',
 					  	'simUploadLimit': 2,
 						'folder'    : '".(($path != '') ? '/'.$path : '')."/workspace".$this->_driver->getMUI()."/".$folder_name."',
-					  	'multi'			: true,
-			      		'onAllComplete': function(event, data) { jQuery('#guideme').html('Upload complete! <b>Add more or click the button that says Process Files!</b>'); jQuery('#uploadcomplete').show(); },
+					  	'multi'		: true,
+			      		'onAllComplete': function(event, data) { 
+							jQuery('#guideme').html('Upload complete! <b>Add more or click the button that says Process Files!</b>'); 
+							jQuery('#uploadcomplete').show(); },
 						'onError': function (a, b, c, d) {
 							if (d.status == 404)
 								alert('Could not find upload script. Use a path relative to: '+'<?= getcwd() ?>');
@@ -258,6 +262,7 @@
 								alert(c.name+' '+d.type+' Limit: '+Math.round(d.sizeLimit/1024)+'KB');
 							else
 								alert('error '+d.type+\": \"+d.text);
+							return false;
 						}
 					});
 				});
@@ -307,12 +312,12 @@
 				}
 			}
 			elseif (count($_POST) > 0) {
-				redirect(SYMPHONY_URL . '/publish/');
 				$this->pageAlert(
 					"Successfully added a whole slew of entries, {$this->_entries_count} to be exact. 
 					To do it again, <a href=\"{$this->_uri}/\">Give it another go below.</a>",
 					Alert::SUCCESS, 
 					array('created', URL, 'extension/multipleuploadinjector'));
+				redirect(SYMPHONY_URL . '/publish/'.General::sanitize($_REQUEST['redirect_to']));
 			}
 			
 			$this->setPageType('form');
