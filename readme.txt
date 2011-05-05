@@ -1,4 +1,4 @@
-Multiple Upload Injector
+Mass Upload Utility
 -------------------------------------------------------------------------------
 
 Version: 2.2.1.0
@@ -21,9 +21,11 @@ CHANGELOG
 -------------------------------------------------------------------------------
 
 v2.2.1.0
-* now uses native html5 uploader, this won't work with a lot of files though
-* removed navigation item 
-* should now work with any upload field
+* I've integrated html5 into the extension, but if you choose a large amount of files it will timeout
+* There is currently no queue or progress bar, it simply posts all the files.
+* It should also now work with *ANY* upload field, but I have not tested it yet.
+* It no longer uses shell exec.
+* It no longer creates a directory in your workspace folder.
 
 Installation
 -------------------------------------------------------------------------------
