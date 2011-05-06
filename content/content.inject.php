@@ -26,6 +26,8 @@
 		protected $_uri = null;
 		protected $_valid = false;
 		protected $_message = '';
+		protected $_field_name;
+		protected $_fields = array();
 		
 		public function __construct(&$parent){
 			parent::__construct($parent);
@@ -69,6 +71,14 @@
 			$this->_action = 'view';
 		}
 		
+		function __actionAPI(){
+
+		
+
+			
+		}
+		
+		
 		function __actionDo(){
 
 			if (!isset($_REQUEST['MUUsource']) or $_REQUEST['MUUsource'] == '')
@@ -76,28 +86,14 @@
 
 			// $fields = $_POST['fields'];
 			$upload_field_name = General::sanitize($_POST['upload_field_name']);
-			if(isset($_FILES['fields'])){
-				$filedata = General::processFilePostData($_FILES['fields']);
-				
-				foreach($filedata as $handle => $data){
-					if(!isset($fields[$handle])) $fields[$handle] = $data;
-					elseif(isset($data['error']) && $data['error'] == 4) $fields['handle'] = NULL;
-					else{
 
-						foreach($data as $ii => $d){
-							if(isset($d['error']) && $d['error'] == 4) $fields[$handle][$ii] = NULL;
-							elseif(is_array($d) && !empty($d)){
 
-								foreach($d as $key => $val)
-									$fields[$handle][$ii][$key] = $val;
-							}
-						}
-					}
-				}
-			}
+			if ((!$this->__processFilePostData(&$fields)) === NULL)
+			{ $this->_message = 'Did you forget to upload some files?'; return; }
+
 
 			if ($fields[$upload_field_name][0][0] == '') {
-				$this->_message = "Please select files to upload."; $this->_valid = false; return; 
+				$this->_message = "Please select files to upload."; return; 
 			}
 	
 
@@ -177,14 +173,65 @@
 		
 
 		/*-------------------------------------------------------------------------
-			Index
+			Views
 		-------------------------------------------------------------------------*/
 
 		public function __view() {
 			$this->__viewIndex();
 		}
 		public function __viewIndex() {
+			$this->__viewDo();
+		}
+		
+		
+		public function __viewAPI() {
+			if (!isset($_REQUEST['MUUsource']) or $_REQUEST['MUUsource'] == '')
+			{ $this->_message = 'You didnt choose a source, perhaps you dont have any sections with an upload field in them?'; $this->__response(); }
 
+			$fields = $_REQUEST['fields'];
+			if ((!$this->__processFilePostData($fields)) === NULL)
+			{ $this->_message = 'Did you forget to upload some files?'; $this->__response(); }
+
+			$sectionManager = new SectionManager($this->_Parent);
+			$section_id = $sectionManager->fetchIDFromHandle(General::sanitize($_REQUEST['MUUsource']));
+			// $this->_section_id = $_POST['fields']['source']; // section id
+			$entryManager = new EntryManager($this->_Parent);
+
+			if(!$section = $sectionManager->fetch($section_id))
+				Administration::instance()->customError(__('Unknown Section'), __('The Section you are looking, <code>%s</code> for could not be found.', $this->_context['section_handle']));
+
+			$entry =& $entryManager->create();
+			$entry->set('section_id', $section_id);
+			$entry->set('author_id', $this->_Parent->Author->get('id'));
+			$entry->set('creation_date', DateTimeObj::get('Y-m-d H:i:s'));
+			$entry->set('creation_date_gmt', DateTimeObj::getGMT('Y-m-d H:i:s'));				
+			
+			if(__ENTRY_FIELD_ERROR__ == $entry->checkPostData($fields, $error))
+			{ $this->_errors[key($error)] = $error[key($error)]; $this->__response(); }
+
+			// setup the data, process it
+			// if(__ENTRY_OK__ != $this->setDataFromPost($entry, $fields, $this->_errors, false, false, $entries))
+			elseif(__ENTRY_OK__ != $entry->setDataFromPost($fields, $error)) {
+				$this->_errors[key($error)] = $error[key($error)];
+				$this->__response();
+			}
+			Symphony::ExtensionManager()->notifyMembers('EntryPreCreate', '/publish/new/', array('section' => $section, 'entry' => &$entry, 'fields' => &$nfields));
+
+			// commit the entry if we made it
+			if(!$entry->commit()){
+				define_safe('__SYM_DB_INSERT_FAILED__', true);
+				$this->pageAlert(NULL, Alert::ERROR);
+			}
+			else
+			{
+				// keep track of it if it was inserted
+				$entries[] = $entry->get('id');
+				$this->_valid = true;
+				Symphony::ExtensionManager()->notifyMembers('EntryPostCreate', '/publish/new/', array('section' => $section, 'entry' => $entry, 'fields' => $nfields));
+			}
+
+			$this->__response();
+			exit;
 		}
 		
 		/* main page */
@@ -205,11 +252,13 @@
 					To do it again, <a href=\"{$this->_uri}/\">Give it another go below.</a>",
 					Alert::SUCCESS, 
 					array('created', URL, 'extension/multipleuploadinjector'));
-				redirect(SYMPHONY_URL . '/publish/'.General::sanitize($_REQUEST['MUUsource']));
+				// redirect(SYMPHONY_URL . '/publish/'.General::sanitize($_REQUEST['MUUsource']));
 			}
 			
 			$this->setPageType('form');
 			$this->Form->setAttribute('enctype', 'multipart/form-data');
+			$this->Form->setAttribute('action','');
+			$this->Form->setAttribute('id', 'MUU');
 			$this->setTitle('Symphony &ndash; Add Multiple Files From a Folder');
 
 
@@ -217,36 +266,6 @@
 
 
 			
-			// $script = new XMLElement('script');
-			// $script->setAttribute("type", 'text/javascript');
-			// $js = '
-			// jQuery(document).ready(function() {
-			// 	                    jQuery("#upload_field").html5_upload({
-			// 	                            url: function(number) {
-			// 	                                    return prompt(number + " url", "/");
-			// 	                            },
-			// 	                            sendBoundary: window.FormData || $.browser.mozilla,
-			// 	                            onStart: function(event, total) {
-			// 	                                    return confirm("You are trying to upload " + total + " files. Are you sure?");
-			// 	                            },
-			// 	                            setName: function(text) {
-			// 	                                            jQuery("#progress_report_name").text(text);
-			// 	                            },
-			// 	                            setStatus: function(text) {
-			// 	                                    jQuery("#progress_report_status").text(text);
-			// 	                            },
-			// 	                            setProgress: function(val) {
-			// 	                                    jQuery("#progress_report_bar").css(\'width\', Math.ceil(val*100)+"%");
-			// 	                            },
-			// 	                            onFinishOne: function(event, response, name, number, total) {
-			// 	                                    //alert(response);
-			// 	                            }
-			// 	                    });
-			// 	            });
-			// 	';
-			// $script->setValue($js);
-
-
 			$fieldset = new XMLElement('fieldset');
 			$fieldset->setAttribute('class', 'settings');
 			// $this->Form->appendChild($fieldset);
@@ -326,7 +345,6 @@
 			if ($css != null) $div->setAttribute('style', $css);
 			$value = array("value" => $_POST['fields'][$field->get('element_name')]);
 			if (!$this->_driver->supportedField($field->get('element_name'))) {
-				// print_r($_POST['fields'][$field->get('element_name')]);
 				$field->displayPublishPanel(
 					$div, $value,
 					(isset($this->_errors[$field->get('id')]) ? $this->_errors[$field->get('id')] : NULL),
@@ -358,7 +376,61 @@
 
 				$hidden = Widget::Input('upload_field_name', $field->get('element_name'), 'hidden');
 
+				$script = new XMLElement('script');
+				$script->setAttribute("type", 'text/javascript');
+				$js = '
+				jQuery(document).ready(function() {
+   	                jQuery("#upload_field").html5_upload({
+						fieldName: "fields['.$field->get('element_name').']",
+	                    url: function(number) {
+							return "'.SYMPHONY_URL.'/extension/massuploadutility/inject/API/?" + jQuery("#MUU").serialize();
+	                    },
+						autostart: false,
+						method: "post",
+	                    sendBoundary: window.FormData || $.browser.mozilla,
+	                    onStart: function(event, total) {
+							if (total <= 0) {
+								if (jQuery("#error").length == 0) {
+									jQuery("#upload_field").parent().parent().wrap("<div id=\"error\" class=\"invalid\"></div>");
+									jQuery("#upload_field").parent().parent().append("<p>No files selected.</p>");
+								}
+								return false;
+							}
+	                        return confirm("You are about to try to upload " + total + " files. Are you sure?");
+	                    },
+	                    setName: function(text) {
+	                        jQuery("#progress_report_name").text(text);
+	                    },
+	                    setStatus: function(text) {
+	                        jQuery("#progress_report_status").text(text);
+	                    },
+	                    setProgress: function(val) {
+	                        jQuery("#progress_report_bar").css(\'width\', Math.ceil(val*100)+"%");
+	                    },
+	                    onFinishOne: function(event, response, name, number, total) {
+							json = jQuery.parseJSON(response);
+							jQuery.each(json["errors"], function(k,v) {
+								jQuery("#field-" + k + " > label").wrap("<div id=\"error\" class=\"invalid\"></div>");
+								jQuery("#field-" + k + " > div > label").append("<p>" + v + "</p>");
+							
+								console.log(k + " "  + v);
+							});
+	                    },
+						onFinish: function(total) {
+							jQuery("#header").prepend("<p id=\"notice\" class=\"success\">Successfully added a whole slew of entries, "+total+" to be exact.</p>");
+						}
+                   	});
+					jQuery("#MUU").submit(function() {
+						jQuery("#error > label > p").remove();
+						jQuery("#error").replaceWith(jQuery("#error").contents());
+						jQuery("#upload_field").trigger("html5_upload.start");
+						return false;
+					});
+					
 
+           		});';
+				$script->setValue($js);
+				
 				$span = new XMLElement('span', NULL, array('class' => 'frame'));
 				$label = Widget::Label($field->get('label'));
 				$class = 'file';
@@ -366,6 +438,7 @@
 				if($field->get('required') != 'yes') $label->appendChild(new XMLElement('i', __('Optional')));
 				$span->appendChild($fileInput);
 				$span->appendChild($progress);
+				$span->appendChild($script);
 
 				$label->appendChild($span);
 				$div->appendChild($label);
@@ -374,6 +447,37 @@
 			return $div;
 		}
 
+		public function __processFilePostData(&$fields) {
+			if(isset($_FILES['fields'])){
+				$filedata = General::processFilePostData($_FILES['fields']);
+				
+				foreach($filedata as $handle => $data){
+					if(!isset($fields[$handle])) $fields[$handle] = $data;
+					elseif(isset($data['error']) && $data['error'] == 4) $fields['handle'] = NULL;
+					else{
+
+						foreach($data as $ii => $d){
+							if(isset($d['error']) && $d['error'] == 4) $fields[$handle][$ii] = NULL;
+							elseif(is_array($d) && !empty($d)){
+
+								foreach($d as $key => $val)
+									$fields[$handle][$ii][$key] = $val;
+							}
+						}
+					}
+				}
+				return $fields;
+			}
+			else
+				return NULL;
+			
+		}
+
+
+		private function __response() {
+			echo json_encode(array("status"=>$this->_valid, "message"=>$this->_message, "errors" => $this->_errors));
+			exit;
+		}
 
 		
 		public function parseErrors() {

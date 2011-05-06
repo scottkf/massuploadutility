@@ -43,11 +43,7 @@
 
 		
 
-		
-		public function addMUUButton($context) {
-			
-			$context->Form->appendChild('hello', Widget::Anchor(__('Create many entries'), Administration::instance()->getCurrentPageURL().'new/'.($filter ? '?prepopulate['.$filter.']=' . $filter_value : ''), __('Create a new entry'), 'create button', NULL, array('accesskey' => 'c')));
-		}
+
 		
 		public function initaliseAdminPageHead($context) {
 			$page = $context['parent']->Page;
