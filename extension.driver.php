@@ -28,11 +28,6 @@
 		
 		public function getSubscribedDelegates() {
 			return array(
-				array(
-					'page'          => '/system/inject/',
-					'delegate'      => 'AddCustomPreferenceFieldsets',
-					'callback'      => 'inject'
-				),
 		      	array(
 	       	 		'page'    => '/backend/',
 		        	'delegate' => 'AdminPagePreGenerate',
@@ -54,10 +49,10 @@
 				$section = $sectionManager->fetch($sectionManager->fetchIDFromHandle($page->_context['section_handle']));
 				foreach ($section->fetchFields() as $f) 
 					if ($this->supportedField($f->get('type'))) {
-					$page->appendSubHeading(__(''), Widget::Anchor(__('Add Many'), URL . '/symphony/extension/massuploadutility/inject/do?MUUsource='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
+					$page->appendSubHeading(__(''), Widget::Anchor(__('Add Many'), URL . '/symphony/extension/massuploadutility/?MUUsource='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
 				}				
 			}
-			if ($page instanceof contentExtensionMassuploadUtilityInject and $page->_context['page'] != 'do') {      
+			if ($page instanceof contentExtensionMassuploadUtilityIndex and $page->_context['page'] != 'do') {      
 				$page->addStylesheetToHead(URL . $assets_path . 'massuploadutility.css', 'screen', 14145);
 				$page->addScriptToHead(URL . $assets_path . 'jquery.html5_upload.js',14156);
 			}

@@ -7,7 +7,24 @@
 	height: 5px;
 }
 #progress_report_bar {
-	background-color: blue;
+	background-color: #C4C4CE;
 	width: 0;
 	height: 100%;
+}
+
+#file_list {
+	height: 100px;
+	overflow: auto;
+	padding: 8px;
+	border: 1px solid #e0e0e0;
+	display: none;
+}
+
+#file_list p {
+	
+}
+
+#file_list p small {
+	display: block;
+	font-size: smaller;
 }

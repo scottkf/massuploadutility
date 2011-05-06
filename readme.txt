@@ -23,6 +23,7 @@ CHANGELOG
 v2.2.1.1
 * Uploading via AJAX
 -- Still need to figure out what to do for error checking if a file fails to validate, rollback or skip? Probably just skip and highlight it.
+-- Also count how many were successful and let the user know.
 
 v2.2.1.0
 * I've integrated html5 into the extension, but if you choose a large amount of files it will timeout
