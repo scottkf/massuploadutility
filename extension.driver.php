@@ -47,19 +47,21 @@
 		
 		public function initaliseAdminPageHead($context) {
 			$page = $context['parent']->Page;
+			$assets_path = '/extensions/massuploadutility/assets/';
+			
 			if ($page instanceof contentPublish and $page->_context['page'] == 'index') {
 				$sectionManager = new SectionManager($this->_Parent);
 				$section = $sectionManager->fetch($sectionManager->fetchIDFromHandle($page->_context['section_handle']));
 				foreach ($section->fetchFields() as $f) 
 					if ($this->supportedField($f->get('type'))) {
-					$page->appendSubHeading(__(''), Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject/do?MUUsource='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
-					// $page->Form->prependChild(Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject?source='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
+					$page->appendSubHeading(__(''), Widget::Anchor(__('Add Many'), URL . '/symphony/extension/massuploadutility/inject/do?MUUsource='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
 				}				
 			}
 			if ($page instanceof contentExtensionMassuploadUtilityInject and $page->_context['page'] != 'do') {      
-				$page->addScriptToHead(URL . '/extensions/massuploadutility/assets/jquery.html5_upload.js',100100990);
+				$page->addStylesheetToHead(URL . $assets_path . 'massuploadutility.css', 'screen', 14145);
+				$page->addScriptToHead(URL . $assets_path . 'jquery.html5_upload.js',14156);
 			}
-
+			
 		}	
 		
 	/*-------------------------------------------------------------------------

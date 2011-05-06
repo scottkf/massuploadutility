@@ -1,0 +1,13 @@
+#progress_report_status {
+	font-style: italic;
+}
+
+#progress_report_bar_container {
+	width: 90%;
+	height: 5px;
+}
+#progress_report_bar {
+	background-color: blue;
+	width: 0;
+	height: 100%;
+}
