@@ -8,8 +8,8 @@
 		public function about() {
 			return array(
 				'name'			=> 'Mass Upload Utility',
-				'version'		=> '2.2.1.0',
-				'release-date'	=> '2011-05-05',
+				'version'		=> '2.2.1.1',
+				'release-date'	=> '2011-05-06',
 				'author'		=> array(
 					'name'			=> 'Scott Tesoriere',
 					'website'		=> 'http://tesoriere.com',
@@ -51,7 +51,7 @@
 				$sectionManager = new SectionManager($this->_Parent);
 				$section = $sectionManager->fetch($sectionManager->fetchIDFromHandle($page->_context['section_handle']));
 				foreach ($section->fetchFields() as $f) 
-					if ($this->supportedField($f->get('element_name'))) {
+					if ($this->supportedField($f->get('type'))) {
 					$page->appendSubHeading(__(''), Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject/do?MUUsource='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
 					// $page->Form->prependChild(Widget::Anchor(__('Add many'), URL . '/symphony/extension/massuploadutility/inject?source='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
 				}				
