@@ -183,7 +183,8 @@
 	                    onFinishOne: function(event, response, name, number, total) {
 							// check json["message"] if its set nothing happened at all.
 							json = jQuery.parseJSON(response);
-							$p = "<p>" + name + " finished: " + json.status + "<small>";
+							class = (json.status == 1) ? "success" : "failure"; 
+							$p = "<p>" + name + "<small id=\"MUU-list\" class=\""+class+"\">";
 							jQuery.each(json["errors"], function(k,v) {
 								// $p += jQuery("#field-" + k + " > label:first").children(":first").attr("name") + " " + v;
 								$p += v;
@@ -192,10 +193,25 @@
 							});
 							$p += "</small></p>";
 							jQuery("#file_list").show();
-							jQuery("#file_list").append($p);
+							if (json.status == 1) jQuery("#file_list").append($p);
+							else jQuery("#file_list").prepend($p);
 	                    },
 						onFinish: function(total) {
-							// jQuery("#header").prepend("<p id=\"notice\" class=\"success\">Successfully added a whole slew of entries, "+total+" to be exact.</p>");
+							failed = jQuery("#MUU-list.failure").size();
+							total = failed + jQuery("#MUU-list.success").size();
+							p = "<p id=\"notice\" class=\"";
+							if (failed == 0) {
+								p += "success\">Successfully added a whole slew of entries, "+total+" to be exact.";								
+							}
+							else {
+								p += "error\">Some error were encountered while attempting to save.";
+								jQuery("#file_list")
+								.animate({ backgroundColor: "#eeee55", opacity: 1.0 }, 200)
+						      	.animate({ backgroundColor: "transparent", opacity: 1.0}, 350);
+							}
+							p += "</p>";
+							jQuery("p#notice").remove();
+							jQuery("#header").prepend(p);
 						}
                    	});
 					jQuery("#MUU").submit(function() {

@@ -1,9 +1,13 @@
+#progress_report_name {
+	float: right;
+}
+
 #progress_report_status {
 	font-style: italic;
 }
 
 #progress_report_bar_container {
-	width: 90%;
+	width: 100%;
 	height: 5px;
 }
 #progress_report_bar {
@@ -27,4 +31,10 @@
 #file_list p small {
 	display: block;
 	font-size: smaller;
+}
+small.failure {
+	color: red;
+}
+small.success {
+	color: green;
 }

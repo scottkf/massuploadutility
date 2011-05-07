@@ -22,8 +22,6 @@ CHANGELOG
 
 v2.2.1.1
 * Uploading via AJAX
--- Still need to figure out what to do for error checking if a file fails to validate, rollback or skip? Probably just skip and highlight it.
--- Also count how many were successful and let the user know.
 
 v2.2.1.0
 * I've integrated html5 into the extension, but if you choose a large amount of files it will timeout
@@ -32,8 +30,16 @@ v2.2.1.0
 * It no longer uses shell exec.
 * It no longer creates a directory in your workspace folder.
 
-Installation
+TODO
 -------------------------------------------------------------------------------
+-- Still need to figure out what to do for error checking if a file fails to validate, rollback or skip? Probably just skip and highlight it.
+-- Also count how many were successful and let the user know.
+-- Color successful ones in green and push to bottom, failed ones in red and to top
+-- Repopulate the upload list (or don't delete) if a file fails to upload for whatever reason.
+-- Integrate index.php into /publish/section when the user clicks add many
+
+
+Installation
 
 1.  Upload the 'massuploadutility' folder in this archive to your Symphony
   'extensions' folder.
