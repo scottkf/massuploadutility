@@ -3,8 +3,8 @@ Mass Upload Utility
 
 Version: 0.9.1
 Author: Scott Tesoriere <scott@tesoriere.com>
-Build Date: 05 May 2011
-Github Repository: http://github.com/scottkf/massuploadutility/tree/v2.2.1.0
+Build Date: 09 May 2011
+Github Repository: http://github.com/scottkf/massuploadutility
 Requirements: Symphony 2.2.1
 
 THIS REQUIRES AN HTML5 COMPATIBLE BROWSER
