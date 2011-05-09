@@ -21,9 +21,10 @@ CHANGELOG
 -------------------------------------------------------------------------------
 
 v0.9.1
+* Should work with every upload field and custom field
 * Flash is no longer used at all, it's pure html5
 * Uploading multiple files is nearly
-* Added localisation (most of the text relies in JS, but there's a couple in php)
+* Added support for localisation (most of the text relies in JS, but there's a couple in php)
 * The workflow is now exactly the same as it is for adding a regular entry, with 
 	the exception that you can select multiple files, and when you do, thats when
 	my utility kicks in.
@@ -40,7 +41,8 @@ v0.9.03
 
 TODO
 -------------------------------------------------------------------------------
--- Still need to figure out what to do for error checking if a file fails to validate, rollback or skip? Currently just skipping and highlighting
+-- Still need to figure out what to do for error checking if a file fails to validate, rollback or skip? 
+	Currently just skipping and highlighting
 -- Repopulate the upload list (or don't delete) if a file fails to upload for whatever reason
 -- Add {#} variables or something so a field can change dynamically 
 -- Notify the user that it's possible to select multiple files
