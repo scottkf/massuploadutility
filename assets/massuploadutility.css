@@ -4,6 +4,7 @@
 
 #progress_report_status {
 	font-style: italic;
+	margin-top: 10px;
 }
 
 #progress_report_bar_container {
@@ -25,12 +26,17 @@
 }
 
 #file_list p {
-	
+	margin: 0px;
+	font-size: 0.9em;
 }
 
 #file_list p small {
-	display: block;
-	font-size: smaller;
+	font-size: 1.1em;
+}
+
+#file_list p img {
+	height: 12px;
+	width: 12px;
 }
 small.failure {
 	color: red;

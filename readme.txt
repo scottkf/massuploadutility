@@ -1,29 +1,37 @@
 Mass Upload Utility
 -------------------------------------------------------------------------------
 
-Version: 2.2.1.0
+Version: 0.9.1
 Author: Scott Tesoriere <scott@tesoriere.com>
 Build Date: 05 May 2011
 Github Repository: http://github.com/scottkf/massuploadutility/tree/v2.2.1.0
 Requirements: Symphony 2.2.1
 
+THIS REQUIRES AN HTML5 COMPATIBLE BROWSER
+
 If you're using an older version of Symphony, please use v0.9 of the Mass Upload Utility:
 https://github.com/scottkf/massuploadutility/tree/v0.9
 
+PURPOSE
+-------------------------------------------------------------------------------
 A symphony extension to allow you to add a folder of files into a section that 
-has an upload field, it probably doesn't work with other upload fields.
-
-Warning: This extension requires the use of shell_exec and copy(). Shell_exec
-for getting the mimetype reliably, and copy to take care of the copying!
-
+has an upload field, it *should* work with all upload fields. Testing is needed.
 
 CHANGELOG
 -------------------------------------------------------------------------------
 
-v2.2.1.1
+v0.9.1
+* Flash is no longer used at all, it's pure html5
+* Uploading multiple files is nearly
+* Added localisation (most of the text relies in JS, but there's a couple in php)
+* The workflow is now exactly the same as it is for adding a regular entry, with 
+	the exception that you can select multiple files, and when you do, thats when
+	my utility kicks in.
+ 
+v0.9.09
 * Uploading via AJAX
 
-v2.2.1.0
+v0.9.03
 * I've integrated html5 into the extension, but if you choose a large amount of files it will timeout
 * There is currently no queue or progress bar, it simply posts all the files.
 * It should also now work with *ANY* upload field, but I have not tested it yet.
@@ -32,11 +40,11 @@ v2.2.1.0
 
 TODO
 -------------------------------------------------------------------------------
--- Still need to figure out what to do for error checking if a file fails to validate, rollback or skip? Probably just skip and highlight it.
--- Also count how many were successful and let the user know.
--- Color successful ones in green and push to bottom, failed ones in red and to top
--- Repopulate the upload list (or don't delete) if a file fails to upload for whatever reason.
--- Integrate index.php into /publish/section when the user clicks add many
+-- Still need to figure out what to do for error checking if a file fails to validate, rollback or skip? Currently just skipping and highlighting
+-- Repopulate the upload list (or don't delete) if a file fails to upload for whatever reason
+-- Add {#} variables or something so a field can change dynamically 
+-- Notify the user that it's possible to select multiple files
+-- Check for html5 support before doing anything
 
 
 Installation
@@ -52,20 +60,18 @@ Usage
 -------------------------------------------------------------------------------
 
 1. Go to the index of a section with an upload field
-2. Click the button that says 'Add Many'
-3. Choose default values if necessary, then click Process files, and if successful
-  you will be redirected to the index. 
+2. Click the button that says 'Create new'
+3. If there's an upload field, my script will turn on, select multiple files,
+	enter other values as necessary, and click 'Create Entry'
 
 
 BUGS
 -------------------------------------------------------------------------------
 
 - If you receive an error on the form, you have to select all the files again
-- No notification is received on the index after successful input
-- If more than one upload field is in a section, this will fail
+- If more than one upload field is in a section, this will fail on purpose (feature?)
 
 TROUBLESHOOTING
 -------------------------------------------------------------------------------
 
-INSTALLING: If you have problems installing, manually create the 
-	/workspace/uploads/mui directory and chmod it 777, Then try installing again.
+????

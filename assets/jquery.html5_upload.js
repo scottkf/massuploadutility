@@ -1,4 +1,5 @@
 (function($) {
+	
         jQuery.fn.html5_upload = function(options) {
 
                 var available_events = ['onStart', 'onStartOne', 'onProgress', 'onFinishOne', 'onFinish', 'onError'];
@@ -18,7 +19,7 @@
                         onError: function(event, name, error) {
                         },
                         onBrowserIncompatible: function() {
-                                alert("Sorry, but your browser is incompatible with uploading files using HTML5 (at least, with current preferences.\n Please install the latest version of Firefox, Safari or Chrome");
+                                alert(Symphony.Language.get("Sorry, but your browser is incompatible with uploading files using HTML5 (at least, with current preferences.\n Please install the latest version of Firefox, Safari or Chrome"));
                         },
                         autostart: true,
                         autoclear: true,
@@ -28,10 +29,10 @@
                         method: 'post',
 
                         STATUSES: {
-                                'STARTED':              'Start',
-                                'PROGRESS':             'Progress',
-                                'LOADED':               'Loaded',
-                                'FINISHED':             'Finished'
+                                'STARTED':              Symphony.Language.get('Start'),
+                                'PROGRESS':             Symphony.Language.get('Progress'),
+                                'LOADED':               Symphony.Language.get('Loaded'),
+                                'FINISHED':             Symphony.Language.get('Finished')
                         },
                         headers: {
                                 "Cache-Control":"no-cache",
@@ -50,7 +51,7 @@
                         setProgress: function(value) {},
 
                         genName: function(file, number, total) {
-                                return file + "(" + (number+1) + " of " + total + ")";
+                                return file + " (" + (number+1) + " / " + total + ")";
                         },
                         genStatus: function(progress, finished) {
                                 if (finished) {

@@ -8,8 +8,8 @@
 		public function about() {
 			return array(
 				'name'			=> 'Mass Upload Utility',
-				'version'		=> '2.2.1.1',
-				'release-date'	=> '2011-05-06',
+				'version'		=> '0.9.1',
+				'release-date'	=> '2011-05-09',
 				'author'		=> array(
 					'name'			=> 'Scott Tesoriere',
 					'website'		=> 'http://tesoriere.com',
@@ -44,28 +44,16 @@
 			$page = $context['parent']->Page;
 			$assets_path = '/extensions/massuploadutility/assets/';
 			
-			if ($page instanceof contentPublish and $page->_context['page'] == 'index') {
-				$sectionManager = new SectionManager($this->_Parent);
-				$section = $sectionManager->fetch($sectionManager->fetchIDFromHandle($page->_context['section_handle']));
-				foreach ($section->fetchFields() as $f) 
-					if ($this->supportedField($f->get('type'))) {
-					$page->appendSubHeading(__(''), Widget::Anchor(__('Add Many'), URL . '/symphony/extension/massuploadutility/?MUUsource='.$page->_context['section_handle'], __('Add Many'), 'muu button', NULL, array('accesskey' => 'c')));
-				}				
-			}
-			if ($page instanceof contentExtensionMassuploadUtilityIndex and $page->_context['page'] != 'do') {      
+			if ($page instanceof contentPublish and $page->_context['page'] == 'new') {      
 				$page->addStylesheetToHead(URL . $assets_path . 'massuploadutility.css', 'screen', 14145);
+				$page->addScriptToHead(URL . $assets_path . 'jquery.massuploadutility.js',14156);
 				$page->addScriptToHead(URL . $assets_path . 'jquery.html5_upload.js',14156);
 			}
-			
 		}	
 		
 	/*-------------------------------------------------------------------------
 		Utility functions:
 	-------------------------------------------------------------------------*/
-	// supporting everything with upload in it's name, this may or may not work
-	public function supportedField($name) {
-		return preg_match('/upload/',$name);
-	}
 
 
 	}
