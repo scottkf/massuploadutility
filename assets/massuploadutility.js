@@ -90,7 +90,7 @@
 						p += "success\">" +  Symphony.Language.get('Successfully added a whole slew of entries, {$total} to be exact.', { 'total': total });
 						p += " \
 							<a href='"+urlBase+"/symphony/publish/"+source+"/new'>Create more?</a> \
-							<a href='"+urlBase+"/symphony/publish/"+source+"'>View all Entries</a>";								
+							<a href='"+urlBase+"/symphony/publish/"+source+"'>View all Entries</a>";		// LOCALIZE THESE						
 					}
 					else {
 						p += "error\">" + Symphony.Language.get('Some errors were encountered while attempting to save.');

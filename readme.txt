@@ -47,6 +47,7 @@ TODO
 -- Add {#} variables or something so a field can change dynamically 
 -- Notify the user that it's possible to select multiple files
 -- Check for html5 support before doing anything
+-- Add options for which sections can be mass uploaded
 
 
 Installation
