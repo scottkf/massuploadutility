@@ -1,10 +1,10 @@
 ## Mass Upload Utility ##
 
-Version: 0.9.3
-Author: Scott Tesoriere <scott@tesoriere.com>
-Build Date: 10 May 2011
-Github Repository: http://github.com/scottkf/massuploadutility
-Requirements: Symphony 2.2
+- Version: 0.9.3
+- Author: Scott Tesoriere <scott@tesoriere.com>
+- Build Date: 10 May 2011
+- Github Repository: http://github.com/scottkf/massuploadutility
+- Requirements: Symphony 2.2
 
 THIS REQUIRES AN HTML5 COMPATIBLE BROWSER
 
@@ -12,6 +12,7 @@ If you're using an older version of Symphony, please use v0.9 of the Mass Upload
 https://github.com/scottkf/massuploadutility/tree/v0.9
 
 **PURPOSE**
+
 A symphony extension to allow you to add a folder of files into a section that 
 has an upload field, it *should* work with all upload fields. Testing is needed.
 
