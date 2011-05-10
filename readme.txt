@@ -25,6 +25,8 @@ v0.9.2
 * Forgot to localise a couple strings
 * A quick blurb to let the user know they can upload multiple files
 * Checking for HTML5 support
+* Added support for using variables in any other input field, like {$number} will
+	dynamically change
 
 v0.9.1
 * Should work with every upload field and custom field
@@ -48,7 +50,7 @@ v0.9.03
 TODO
 -------------------------------------------------------------------------------
 -- Repopulate the upload list (or don't delete) if a file fails to upload for whatever reason
--- Add {#} variables or something so a field can change dynamically 
+-- Possibly expand the {$} variables to contain other things (like what?)
 
 
 Installation

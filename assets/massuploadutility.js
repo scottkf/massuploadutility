@@ -31,10 +31,15 @@
 		urlAssets = urlBase + '/extensions/massuploadutility/assets';
 		source = window.location.pathname.replace(/.*\/symphony\/publish\/(.*)\/new\//i,'$1');
 	
+		function idSafeFilename(string) {
+			return string.replace(/([^\w\d_-])/gi,'-');
+		};
+	
+	
 		//  if there's more than one upload field, I have no idea what to do, and it's not terribly important
 		if (fileField.size() == 1) {
 			label = fileField.parent().parent();
-			label.html(label.html().replace(/^([a-z]+[\s]+)(\<[a-z]+)/i, '$1 ('+Symphony.Language.get("multiple files can be selected")+') $2'));
+			label.html(label.html().replace(/^([\w\s]+)(\<[a-z]+)/i, '$1 ('+Symphony.Language.get("multiple files can be selected")+') $2'));
 			fileField = $("input[type='file']");
 			fileField.attr('multiple', 'true');
 			fileField.parent().append(" \
@@ -66,6 +71,18 @@
 				autostart: false,
 				method: "post",
 		        sendBoundary: window.FormData || $.browser.mozilla,
+				onChange: function(event, files) {
+					$("#file_list").empty();
+					if (files.length <= 1)
+						$("#file_list").hide();
+					else if (files.length > 1) {
+						$("#file_list").show();
+						$.each(files, function (k,v) {
+							p = "<p id='"+idSafeFilename(v.name)+"'><img src='"+urlAssets + "/images/queued.png' />"+v.name+"</p>";
+							$("#file_list").prepend(p);						
+						});
+					}
+				},
 		        onStart: function(event, total) {
 					// should never even get here, but just incase!
 					if (total <= 0) {
@@ -85,15 +102,15 @@
 		        onFinishOne: function(event, response, name, number, total) {
 					// check json["message"] if its set nothing happened at all.
 					json = $.parseJSON(response);
-					css = (json.status == 1) ? "success" : "failure"; 
-					p = "<p><img src='"+urlAssets + "/images/"+json.status+".png' />&nbsp;" + name + "&nbsp;<small id='MUU-list' class="+css+">";
+					css = (json.status == 1) ? "success" : "failure";
+					id = idSafeFilename(name);
+					p = "<p id='"+id+"'><img src='"+urlAssets + "/images/"+json.status+".png' />&nbsp;" + name + "&nbsp;<small id='MUU-list' class="+css+">";
 					$.each(json["errors"], function(k,v) {
 						p += v;
 					});
 					p += "</small></p>";
 					$("#file_list").show();
-					if (json.status == 1) $("#file_list").append(p);
-					else $("#file_list").prepend(p);
+					$('p#'+id).replaceWith(p);
 		        },
 				onFinish: function(total) {
 					failed = $("#MUU-list.failure").size();

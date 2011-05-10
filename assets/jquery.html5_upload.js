@@ -2,8 +2,10 @@
 	
         jQuery.fn.html5_upload = function(options) {
 
-                var available_events = ['onStart', 'onStartOne', 'onProgress', 'onFinishOne', 'onFinish', 'onError'];
+                var available_events = ['onChange', 'onStart', 'onStartOne', 'onProgress', 'onFinishOne', 'onFinish', 'onError'];
                 var options = jQuery.extend({
+						onChange: function(event, files) {
+						},
                         onStart: function(event, total) {
                                 return true;
                         },
@@ -72,10 +74,15 @@
                         }
                 }, options);
 
-                function upload() {
+                function upload(event) {
+                    	var $this = $(this);
                         var files = this.files;
                         var total = files.length;
-                        var $this = $(this);
+	                	$this.trigger('html5_upload.onChange', [this.files]);
+
+						if (options.autostart == false && event.type == 'change') {
+							return false;							
+						}
                         if (!$this.triggerHandler('html5_upload.onStart', [total])) {
                                 return false;
                         }
@@ -195,16 +202,21 @@
                                 xhr:                                    new XMLHttpRequest(),
                                 continue_after_abort:   true
                         };
-                        if (options.autostart) {
-                                $(this).bind('change', upload);
-                        }
                         for (event in available_events) {
                                 if (options[available_events[event]]) {
                                         $(this).bind("html5_upload."+available_events[event], options[available_events[event]]);
                                 }
                         }
+						$(this).bind('change', {start: options.autostart}, upload);
+						                        // if (options.autostart) {
+						//                                 $(this).bind('change', upload);
+						//                         }
+						// else {
+						// 	$(this).bind('change', $(this).html5_upload.onAdd('',''));
+						//                             // $(this).bind('change', $(this).trigger('html5_upload.onAdd', [this.files]));
+						// }
                         $(this)
-                                .bind('html5_upload.start', upload)
+                                .bind('html5_upload.start', {start: true}, upload)
                                 .bind('html5_upload.cancelOne', function() {
                                         this.html5_upload['xhr'].abort();
                                 })
