@@ -1,5 +1,4 @@
 ## Mass Upload Utility ##
--------------------------------------------------------------------------------
 
 Version: 0.9.3
 Author: Scott Tesoriere <scott@tesoriere.com>
@@ -13,12 +12,10 @@ If you're using an older version of Symphony, please use v0.9 of the Mass Upload
 https://github.com/scottkf/massuploadutility/tree/v0.9
 
 **PURPOSE**
--------------------------------------------------------------------------------
 A symphony extension to allow you to add a folder of files into a section that 
 has an upload field, it *should* work with all upload fields. Testing is needed.
 
 **CHANGELOG**
--------------------------------------------------------------------------------
 
 *v0.9.3*
 
@@ -57,14 +54,12 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
 - It no longer creates a directory in your workspace folder.
 
 **TODO**
--------------------------------------------------------------------------------
 
 - Repopulate the upload list (or don't delete) if a file fails to upload for whatever reason
 - Possibly expand the {$} variables to contain other things (like what?)
 
 
 **Installation**
--------------------------------------------------------------------------------
 
 1.  Upload the 'massuploadutility' folder in this archive to your Symphony
   'extensions' folder.
@@ -74,7 +69,6 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
 
 
 **Usage**
--------------------------------------------------------------------------------
 
 1. Go to the index of a section with an upload field
 2. Click the button that says 'Create new'
@@ -83,12 +77,6 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
 
 
 **BUGS**
--------------------------------------------------------------------------------
 
 - If you receive an error on the form, you have to select all the files again
 - If more than one upload field is in a section, this will fail on purpose (feature?)
-
-**TROUBLESHOOTING**
--------------------------------------------------------------------------------
-
-????
