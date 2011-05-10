@@ -22,6 +22,8 @@ CHANGELOG
 
 v0.9.2
 * Added ability to exclude sections and users (I stole this from Craig's tracker extension)
+* Forgot to localise a couple strings
+* A quick blurb to let the user know they can upload multiple files
 
 v0.9.1
 * Should work with every upload field and custom field
@@ -48,7 +50,6 @@ TODO
 	Currently just skipping and highlighting
 -- Repopulate the upload list (or don't delete) if a file fails to upload for whatever reason
 -- Add {#} variables or something so a field can change dynamically 
--- Notify the user that it's possible to select multiple files
 -- Check for html5 support before doing anything
 -- Add options for which sections can be mass uploaded
 

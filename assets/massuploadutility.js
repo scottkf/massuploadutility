@@ -2,6 +2,12 @@
 
 	$(document).ready(function() {
 
+		// check for html5 input multiple support first
+		html5Support = ("multiple" in document.createElement("input"));
+		if(!html5Support){
+			alert("Sorry, your browser doesn't support HTML5!");
+			return false;
+		}
 		Symphony.Language.add({
 			'Successfully added a whole slew of entries, {$total} to be exact.': false,
 			'But {$total} entries were successfully added.': false,
@@ -24,7 +30,7 @@
 		urlAssets = urlBase + '/extensions/massuploadutility/assets';
 		source = window.location.pathname.replace(/.*\/symphony\/publish\/(.*)\/new\//i,'$1');
 	
-		//  if there's more than one upload field, we have no idea what to do
+		//  if there's more than one upload field, I have no idea what to do and it's not terribly important
 		if (fileField.size() == 1) {
 			label = fileField.parent().parent();
 			label.html(label.html().replace(/^([a-z]+[\s]+)(\<[a-z]+)/i, '$1 ('+Symphony.Language.get("multiple files can be selected")+') $2'));
@@ -51,11 +57,8 @@
 				method: "post",
 		        sendBoundary: window.FormData || $.browser.mozilla,
 		        onStart: function(event, total) {
+					// should never even get here, but just incase!
 					if (total <= 0) {
-						if ($("#error").length == 0) {
-							fileField.parent().parent().wrap("<div id=\"error\" class=\"invalid\"></div>");
-							fileField.parent().parent().append("<p>No files selected.</p>");
-						}
 						return false;
 					}
 					return true;
