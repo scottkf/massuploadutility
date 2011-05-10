@@ -27,6 +27,7 @@ v0.9.2
 * Checking for HTML5 support
 * Added support for using variables in any other input field, like {$number} will
 	dynamically change
+* When selecting files, they're populated to the queue so you know you queued files
 
 v0.9.1
 * Should work with every upload field and custom field
