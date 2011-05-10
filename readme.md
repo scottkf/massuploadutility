@@ -1,28 +1,28 @@
-## Mass Upload Utility ##
+# Mass Upload Utility
 
 - Version: 0.9.3
-- Author: Scott Tesoriere <scott@tesoriere.com>
-- Build Date: 10 May 2011
-- Github Repository: http://github.com/scottkf/massuploadutility
+- Date: 10 May 2011
 - Requirements: Symphony 2.2
+- Author: Scott Tesoriere <scott@tesoriere.com>
+- Github Repository: http://github.com/scottkf/massuploadutility
 
 THIS REQUIRES AN HTML5 COMPATIBLE BROWSER
 
 If you're using an older version of Symphony, please use v0.9 of the Mass Upload Utility:
 https://github.com/scottkf/massuploadutility/tree/v0.9
 
-**PURPOSE**
+## PURPOSE
 
 A symphony extension to allow you to add a folder of files into a section that 
 has an upload field, it *should* work with all upload fields. Testing is needed.
 
-**CHANGELOG**
+## CHANGELOG
 
-*v0.9.3*
+**v0.9.3**
 
 - Reversed the order of the way the queue is populated (so it should be alphabetical now)
 
-*v0.9.2*
+**v0.9.2**
 
 - Added ability to exclude sections and users (I stole this from Craig's tracker extension)
 - Forgot to localise a couple strings
@@ -32,7 +32,7 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
 	dynamically change
 - When selecting files, they're populated to the queue so you know you queued files
 
-*v0.9.1*
+**v0.9.1**
 
 - Should work with every upload field and custom field
 - Flash is no longer used at all, it's pure html5
@@ -42,11 +42,11 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
 	the exception that you can select multiple files, and when you do, thats when
 	my utility kicks in.
  
-*v0.9.09*
+**v0.9.09**
 
 - Uploading via AJAX
 
-*v0.9.03*
+**v0.9.03**
 
 - I've integrated html5 into the extension, but if you choose a large amount of files it will timeout
 - There is currently no queue or progress bar, it simply posts all the files.
@@ -54,13 +54,13 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
 - It no longer uses shell exec.
 - It no longer creates a directory in your workspace folder.
 
-**TODO**
+## Todo
 
 - Repopulate the upload list (or don't delete) if a file fails to upload for whatever reason
 - Possibly expand the {$} variables to contain other things (like what?)
 
 
-**Installation**
+## Installation
 
 1.  Upload the 'massuploadutility' folder in this archive to your Symphony
   'extensions' folder.
@@ -69,7 +69,7 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
   the with-selected menu, then click Apply.
 
 
-**Usage**
+## Usage
 
 1. Go to the index of a section with an upload field
 2. Click the button that says 'Create new'
@@ -77,7 +77,7 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
 	enter other values as necessary, and click 'Create Entry'
 
 
-**BUGS**
+## Bugs/Features
 
 - If you receive an error on the form, you have to select all the files again
 - If more than one upload field is in a section, this will fail on purpose (feature?)
