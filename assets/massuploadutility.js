@@ -79,7 +79,7 @@
 						$("#file_list").show();
 						$.each(files, function (k,v) {
 							p = "<p id='"+idSafeFilename(v.name)+"'><img src='"+urlAssets + "/images/queued.png' />"+v.name+"</p>";
-							$("#file_list").prepend(p);						
+							$("#file_list").append(p);						
 						});
 					}
 				},
