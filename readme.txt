@@ -20,6 +20,9 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
 CHANGELOG
 -------------------------------------------------------------------------------
 
+v0.9.2
+* Added ability to exclude sections and users (I stole this from Craig's tracker extension)
+
 v0.9.1
 * Should work with every upload field and custom field
 * Flash is no longer used at all, it's pure html5

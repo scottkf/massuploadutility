@@ -12,7 +12,8 @@
 			'Start' : false,
 			'Progress' : false,
 			'Loaded' : false,
-			'Finished' : false
+			'Finished' : false,
+			'multiple files can be selected' : false
 		});
 
 		// this should theoretically support any upload field
@@ -25,6 +26,9 @@
 	
 		//  if there's more than one upload field, we have no idea what to do
 		if (fileField.size() == 1) {
+			label = fileField.parent().parent();
+			label.html(label.html().replace(/^([a-z]+[\s]+)(\<[a-z]+)/i, '$1 ('+Symphony.Language.get("multiple files can be selected")+') $2'));
+			fileField = $("input[type='file']");
 			fileField.attr('multiple', 'true');
 			fileField.parent().append(" \
 				<input type='hidden' name='MUUsource' value='"+source+"' /> \
@@ -71,10 +75,7 @@
 					css = (json.status == 1) ? "success" : "failure"; 
 					p = "<p><img src='"+urlAssets + "/images/"+json.status+".png' />&nbsp;" + name + "&nbsp;<small id='MUU-list' class="+css+">";
 					$.each(json["errors"], function(k,v) {
-						// $p += jQuery("#field-" + k + " > label:first").children(":first").attr("name") + " " + v;
 						p += v;
-						// jQuery("#field-" + k + " > label").wrap("<div id=\"error\" class=\"invalid\"></div>");
-						// jQuery("#field-" + k + " > div > label").append("<p>" + v + "</p>");
 					});
 					p += "</small></p>";
 					$("#file_list").show();
@@ -89,8 +90,8 @@
 					if (failed == 0) {
 						p += "success\">" +  Symphony.Language.get('Successfully added a whole slew of entries, {$total} to be exact.', { 'total': total });
 						p += " \
-							<a href='"+urlBase+"/symphony/publish/"+source+"/new'>Create more?</a> \
-							<a href='"+urlBase+"/symphony/publish/"+source+"'>View all Entries</a>";		// LOCALIZE THESE						
+							<a href='"+urlBase+"/symphony/publish/"+source+"/new'>"+Symphony.Language.get("Create more?")+"</a> \
+							<a href='"+urlBase+"/symphony/publish/"+source+"'>"+Symphony.Language.get("View all Entries")+"</a>";						
 					}
 					else {
 						p += "error\">" + Symphony.Language.get('Some errors were encountered while attempting to save.');

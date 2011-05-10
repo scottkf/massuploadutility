@@ -117,7 +117,7 @@
 			$label->appendChild($input);
 			$div->appendChild($label);
 			
-		// Excluded Users
+			// Excluded Users
 			$label = Widget::Label(__('Excluded Users'));
 			$options = array();
 			
