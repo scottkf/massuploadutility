@@ -8,6 +8,7 @@
 			alert("Sorry, your browser doesn't support HTML5!");
 			return false;
 		}
+		
 		Symphony.Language.add({
 			'Successfully added a whole slew of entries, {$total} to be exact.': false,
 			'But {$total} entries were successfully added.': false,
@@ -30,7 +31,7 @@
 		urlAssets = urlBase + '/extensions/massuploadutility/assets';
 		source = window.location.pathname.replace(/.*\/symphony\/publish\/(.*)\/new\//i,'$1');
 	
-		//  if there's more than one upload field, I have no idea what to do and it's not terribly important
+		//  if there's more than one upload field, I have no idea what to do, and it's not terribly important
 		if (fileField.size() == 1) {
 			label = fileField.parent().parent();
 			label.html(label.html().replace(/^([a-z]+[\s]+)(\<[a-z]+)/i, '$1 ('+Symphony.Language.get("multiple files can be selected")+') $2'));
@@ -50,8 +51,17 @@
 			); 
 		    fileField.html5_upload({
 				fieldName: fileField.attr('name'),
+				insert: function(string, inserts) {
+					$.each(inserts, function(index, value) {
+						string = string.replace(new RegExp("%7B%24" + index + "%7D", "gi"), value); 
+					});
+					return string;
+				},
 		        url: function(number) {
-					return urlBase + urlMuu + '?' + form.serialize();
+					// support for replacing variables
+					supportedReplacements = { 'number' : number };
+					string = this.insert(form.serialize(), supportedReplacements);
+					return urlBase + urlMuu + '?' + string;
 		        },
 				autostart: false,
 				method: "post",
