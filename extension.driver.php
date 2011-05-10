@@ -1,5 +1,7 @@
 <?php
 
+	require_once(TOOLKIT . '/class.sectionmanager.php');
+
 	class Extension_MassUploadUtility extends Extension {
 	/*-------------------------------------------------------------------------
 		Definition:
