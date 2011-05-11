@@ -10,8 +10,8 @@
 		public function about() {
 			return array(
 				'name'			=> 'Mass Upload Utility',
-				'version'		=> '0.9.2',
-				'release-date'	=> '2011-05-10',
+				'version'		=> '0.9.3',
+				'release-date'	=> '2011-05-11',
 				'author'		=> array(
 					'name'			=> 'Scott Tesoriere',
 					'website'		=> 'http://tesoriere.com',
