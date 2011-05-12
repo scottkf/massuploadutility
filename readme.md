@@ -1,7 +1,7 @@
 # Mass Upload Utility
 
-- Version: 0.9.3
-- Date: 10 May 2011
+- Version: 0.9.5
+- Date: 12 May 2011
 - Requirements: Symphony 2.2
 - Author: Scott Tesoriere <scott@tesoriere.com>
 - Github Repository: http://github.com/scottkf/massuploadutility
@@ -11,12 +11,25 @@ THIS REQUIRES AN HTML5 COMPATIBLE BROWSER
 If you're using an older version of Symphony, please use v0.9 of the Mass Upload Utility:
 https://github.com/scottkf/massuploadutility/tree/v0.9
 
-## PURPOSE
+## Purpose
 
 A symphony extension to allow you to add a folder of files into a section that 
 has an upload field, it *should* work with all upload fields. Testing is needed.
 
-## CHANGELOG
+## Changelog
+
+**v0.9.5**
+
+- No longer clears files from the input[file] box if failed
+- Under the hood changes, no longer duplicates Symphony code, uses a custom event to add entries.
+	Inspiration and thanks to Nick Dunn and his REST API extension!
+- Will highlight which fields have problems and display errors on them (except the upload field)
+	This may get obnoxious and I might turn it off. This is instead of showing them in the queue list.
+	It's customizable by changing a variable in the javascript.
+	
+**v0.9.4** 
+
+- Under the hood changes, internal
 
 **v0.9.3**
 
@@ -56,8 +69,8 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
 
 ## Todo
 
-- Repopulate the upload list (or don't delete) if a file fails to upload for whatever reason
 - Possibly expand the {$} variables to contain other things (like what?)
+- Refine the UI some
 
 
 ## Installation
@@ -79,5 +92,5 @@ has an upload field, it *should* work with all upload fields. Testing is needed.
 
 ## Bugs/Features
 
-- If you receive an error on the form, you have to select all the files again
-- If more than one upload field is in a section, this will fail on purpose (feature?)
+- If more than one upload field is in a section, this will not get used
+	I consider this more a feature.

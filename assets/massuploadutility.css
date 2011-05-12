@@ -17,7 +17,11 @@
 	height: 100%;
 }
 
+#error #file_list {
+}
+
 #file_list {
+	color: black;
 	height: 100px;
 	overflow: auto;
 	padding: 8px;

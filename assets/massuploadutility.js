@@ -5,13 +5,13 @@
 		// check for html5 input multiple support first
 		html5Support = ("multiple" in document.createElement("input"));
 		if(!html5Support){
-			alert("Sorry, your browser doesn't support HTML5!");
+			console.log("Sorry, your browser doesn't support HTML5!");
 			return false;
 		}
 		
 		Symphony.Language.add({
 			'Successfully added a whole slew of entries, {$total} to be exact.': false,
-			'But {$total} entries were successfully added.': false,
+			'However, {$total} entries were successfully added.': false,
 			'Some errors were encountered while attempting to save.': false,
 			'View all Entries': false,
 			'Create more?': false,
@@ -35,7 +35,6 @@
 			return string.replace(/([^\w\d_-])/gi,'-');
 		};
 	
-	
 		//  if there's more than one upload field, I have no idea what to do, and it's not terribly important
 		if (fileField.size() == 1) {
 			label = fileField.parent().parent();
@@ -44,6 +43,7 @@
 			fileField.attr('multiple', 'true');
 			fileField.parent().append(" \
 				<input type='hidden' name='MUUsource' value='"+source+"' /> \
+				<input type='hidden' name='action[api]' value='true' /> \
 				<div id='progress_report'> \
 					<div id='progress_report_name'></div> \
 					<div id='progress_report_status'></div> \
@@ -69,6 +69,7 @@
 					return urlBase + urlMuu + '?' + string;
 		        },
 				autostart: false,
+				autoclear: false,
 				method: "post",
 		        sendBoundary: window.FormData || $.browser.mozilla,
 				onChange: function(event, files) {
@@ -100,33 +101,60 @@
 		            $("#progress_report_bar").css('width', Math.ceil(val*100)+"%");
 		        },
 		        onFinishOne: function(event, response, name, number, total) {
-					// check json["message"] if its set nothing happened at all.
+					// change errorsInQueue to true if you want errors shown in the queue and not on the fields themselves
+					errorsInQueue = false;
 					json = $.parseJSON(response);
-					css = (json.status == 1) ? "success" : "failure";
 					id = idSafeFilename(name);
-					p = "<p id='"+id+"'><img src='"+urlAssets + "/images/"+json.status+".png' />&nbsp;" + name + "&nbsp;<small id='MUU-list' class="+css+">";
-					$.each(json["errors"], function(k,v) {
-						p += v;
-					});
-					p += "</small></p>";
+					p = "<p id='"+id+"'>";
+					if (json != null) {		
+						css = (json.response["_result"] == 'error') ? "failure" : "success";
+						p += "<img src='"+urlAssets + "/images/"+css+".png' />&nbsp;" + name + "&nbsp;<small id='MUU-list' class="+css+">";
+						if (json.response["_result"] == "error") {
+							$.each(json.response, function(k,v) {
+								if (k != "_result" && k != "message" && k != "post-values") {
+									field = $("form *[name='fields["+k+"]']");
+									if (errorsInQueue || field.attr('type') == 'file') {
+										p += v._message + "&nbsp;";
+									}
+									else {
+									// highlight the fields that have errors
+									// if (v._type == "missing") {
+										field = field.parents("label");
+										console.log(field);
+										if (field.parent().attr('id') != 'error') {
+											// field.children(":first").attr("name") + " " + v;
+											field.wrap("<div id=\"error\" class=\"invalid\"></div>");
+											field.parent().append("<p>" + v._message + "</p>");
+										}
+									}
+								}
+							});
+						}
+						p += "</small></p>";
+					}
+					else {
+						p += "An unknown error occurred.</p>";
+					}
 					$("#file_list").show();
 					$('p#'+id).replaceWith(p);
+
 		        },
 				onFinish: function(total) {
 					failed = $("#MUU-list.failure").size();
 					total = failed + $("#MUU-list.success").size();
 					success = total - failed;
 					p = "<p id=\"notice\" class=\"";
-					if (failed == 0) {
+					if (failed == 0 && success > 0) {
 						p += "success\">" +  Symphony.Language.get('Successfully added a whole slew of entries, {$total} to be exact.', { 'total': total });
 						p += " \
 							<a href='"+urlBase+"/symphony/publish/"+source+"/new'>"+Symphony.Language.get("Create more?")+"</a> \
-							<a href='"+urlBase+"/symphony/publish/"+source+"'>"+Symphony.Language.get("View all Entries")+"</a>";						
+							<a href='"+urlBase+"/symphony/publish/"+source+"'>"+Symphony.Language.get("View all Entries")+"</a>";
+							// reset the form here maybe
 					}
 					else {
 						p += "error\">" + Symphony.Language.get('Some errors were encountered while attempting to save.');
 						if (success > 0)
-							p += "&nbsp;" + Symphony.Language.get('But {$total} entries were successfully added.', { 'total' : success});
+							p += "&nbsp;" + Symphony.Language.get('However, {$total} entries were successfully added.', { 'total' : success});
 						$("#file_list")
 						.animate({ backgroundColor: "#eeee55", opacity: 1.0 }, 200)
 				      	.animate({ backgroundColor: "transparent", opacity: 1.0}, 350);
@@ -159,10 +187,10 @@
 			});
 		}	
 		else if (fileField.size() > 1) {
-			console.log("MUU doesn't work with multiple upload fields");
+			console.log("The Mass Upload Utility doesn't work with multiple upload fields.");
 		}
 		else {
-			console.log("No upload fields detected");
+			console.log("No upload fields detected.");
 		}
 	
 	});
