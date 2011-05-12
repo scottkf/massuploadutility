@@ -13,7 +13,16 @@
 		protected $_valid = false;
 		protected $_message = '';
 		
-				
+		public function getSectionID() {
+			$sectionManager = new SectionManager($this->_Parent);
+			
+			$section_id = $sectionManager->fetchIDFromHandle(General::sanitize($_REQUEST['MUUsource']));
+
+			if(!$section = $sectionManager->fetch($section_id))
+				return NULL;
+			else
+				return $section_id;
+		}
 		/**
 		 *	---------------------------------------------------------
 		 *	This functionality is essentially duplicated (and slightly changed)
@@ -30,13 +39,10 @@
 			if (!isset($_REQUEST['MUUsource']) or $_REQUEST['MUUsource'] == '')
 			{ $this->_message = __("You didn't choose a source, perhaps you don't have any sections with an upload field in them?"); $this->__response(); }
 
+			if (($section_id = $this->getSectionID()) === NULL)
+			{ $this->_message = __('The Section you are looking, <code>%s</code> for could not be found.', $this->_context['section_handle']); $this->__response(); }	
 			$sectionManager = new SectionManager($this->_Parent);
 			
-			$section_id = $sectionManager->fetchIDFromHandle(General::sanitize($_REQUEST['MUUsource']));
-
-			if(!$section = $sectionManager->fetch($section_id))
-				Administration::instance()->customError(__('Unknown Section'), __('The Section you are looking, <code>%s</code> for could not be found.', $this->_context['section_handle']));
-
 			$entryManager = new EntryManager($this->_Parent);
 
 			$entry =& $entryManager->create();
