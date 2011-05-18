@@ -107,14 +107,13 @@
 					id = idSafeFilename(name);
 					p = "<p id='"+id+"'>";
 					if (json != null) {		
-						css = (json.response["_result"] == 'error') ? "failure" : "success";
+						css = (json.status == 'error') ? "failure" : "success";
 						p += "<img src='"+urlAssets + "/images/"+css+".png' />&nbsp;" + name + "&nbsp;<small id='MUU-list' class="+css+">";
-						if (json.response["_result"] == "error") {
-							$.each(json.response, function(k,v) {
-								if (k != "_result" && k != "message" && k != "post-values") {
-									field = $("form *[name='fields["+k+"]']");
+						if (json.status == "error") {
+							$.each(json.errors, function(k,v) {
+									field = $("form div[id='field-"+k+"'] input");
 									if (errorsInQueue || field.attr('type') == 'file') {
-										p += v._message + "&nbsp;";
+										p += v + "&nbsp;";
 									}
 									else {
 									// highlight the fields that have errors
@@ -124,11 +123,11 @@
 										if (field.parent().attr('id') != 'error') {
 											// field.children(":first").attr("name") + " " + v;
 											field.wrap("<div id=\"error\" class=\"invalid\"></div>");
-											field.parent().append("<p>" + v._message + "</p>");
+											field.parent().append("<p>" + v + "</p>");
 										}
 									}
 								}
-							});
+							);
 						}
 						p += "</small></p>";
 					}

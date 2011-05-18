@@ -34,23 +34,31 @@
 		 *	---------------------------------------------------------
 		 */
 		public function view() {
+
 			if (!isset($_REQUEST['MUUsource']) or $_REQUEST['MUUsource'] == '')
 			{ exit; }	
 
 			if (($section_id = $this->getSectionId()) === NULL)
 			{ exit; }	
 
-			$_POST['fields'] = $_REQUEST['fields'];
-			$_POST['action'] = $_REQUEST['action'];
+			$_POST = $_REQUEST;
+			$_POST['action']['save'] = true;
 			
-			$event = new Event_Mass_Upload_Utility_Entry(Frontend::instance(), array());
 
-			// Borrowed from Nick Dunn
-			$xml = $event->load();
-			if(is_array($xml)) $xml = reset($xml);
-			if($xml instanceOf XMLElement) $xml = $xml->generate(TRUE);			
+			require_once(CONTENT . '/content.publish.php');
+			$content = new contentPublish($this->_Parent);
+			// this is used by contentPublish to see the source section
+			$content->_context = array();
+			$content->_context['section_handle'] = General::sanitize($_REQUEST['MUUsource']);
 
-			echo(json_encode(XMLToArray::convert($xml)));
+			// this function takes care of all the entry adding
+			$content->__actionNew();
+			
+			$response['errors'] = $content->_errors;
+			$response['status'] = (count($content->_errors) ? 'error' : 'success');
+			$response['message'] = ($content->Alert instanceof Alert ? $content->Alert->__get('message') : '');
+
+			echo(json_encode($response));
 				
 			exit;
 		}
