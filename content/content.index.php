@@ -4,8 +4,6 @@
 	require_once(TOOLKIT . '/class.sectionmanager.php');
 	require_once(TOOLKIT . '/class.entrymanager.php');
 	require_once(CORE . '/class.frontend.php');
-	require_once(EXTENSIONS . '/massuploadutility/events/event.mass_upload_utility_entry.php');
-	require_once(EXTENSIONS . '/massuploadutility/lib/class.xmltoarray.php');
 
 	/**
 	 * Called to build the content for the page. 
