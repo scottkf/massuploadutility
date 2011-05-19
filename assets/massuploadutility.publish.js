@@ -20,7 +20,7 @@
 			'Progress' : false,
 			'Loaded' : false,
 			'Finished' : false,
-			'multiple files can be selected' : false
+			'multiple files can be selected, use the <code>shift</code> or <code>ctrl/cmd</code> key' : false
 		});
 
 		// this should theoretically support any upload field
@@ -38,7 +38,7 @@
 		//  if there's more than one upload field, I have no idea what to do, and it's not terribly important
 		if (fileField.size() == 1) {
 			label = fileField.parent().parent();
-			label.html(label.html().replace(/^([\w\s]+)(\<[a-z]+)/i, '$1 ('+Symphony.Language.get("multiple files can be selected")+') $2'));
+			label.html(label.html().replace(/^([\w\s]+)(\<[a-z]+)/i, '$1 ('+Symphony.Language.get("multiple files can be selected, use the <code>shift</code> or <code>ctrl/cmd</code> key")+') $2'));
 			fileField = $("input[type='file']");
 			fileField.attr('multiple', 'true');
 			fileField.parent().append(" \

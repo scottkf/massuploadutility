@@ -64,7 +64,7 @@
 				$this->validateSection($section_id) and $this->validateUser()) {   
 					   
 				$page->addStylesheetToHead(URL . $assets_path . 'massuploadutility.css', 'screen', 14145);
-				$page->addScriptToHead(URL . $assets_path . 'massuploadutility.js',14156);
+				$page->addScriptToHead(URL . $assets_path . 'massuploadutility.publish.js',14156);
 				$page->addScriptToHead(URL . $assets_path . 'jquery.html5_upload.js',14156);
 			}
 		}	
