@@ -5,7 +5,7 @@
 		// check for html5 input multiple support first
 		html5Support = ("multiple" in document.createElement("input"));
 		if(!html5Support){
-			console.log("Sorry, your browser doesn't support HTML5!");
+			// console.log("Sorry, your browser doesn't support HTML5!");
 			return false;
 		}
 		
@@ -119,7 +119,7 @@
 									// highlight the fields that have errors
 									// if (v._type == "missing") {
 										field = field.parents("label");
-										console.log(field);
+										// console.log(field);
 										if (field.parent().attr('id') != 'error') {
 											// field.children(":first").attr("name") + " " + v;
 											field.wrap("<div id=\"error\" class=\"invalid\"></div>");
@@ -186,10 +186,10 @@
 			});
 		}	
 		else if (fileField.size() > 1) {
-			console.log("The Mass Upload Utility doesn't work with multiple upload fields.");
+			// console.log("The Mass Upload Utility doesn't work with multiple upload fields.");
 		}
 		else {
-			console.log("No upload fields detected.");
+			// console.log("No upload fields detected.");
 		}
 	
 	});
