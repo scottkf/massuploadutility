@@ -46,11 +46,26 @@
 		        	'delegate' => 'AdminPagePreGenerate',
 		        	'callback' => 'initaliseAdminPageHead'
 	      		),
+				array(
+					'page'		=> '/publish/new/',
+					'delegate'	=> 'EntryPostCreate',
+					'callback'	=> 'returnJSON'
+				),	
 			);
 		}
 
 		
 
+
+		// this only reaches here if an entry is created successfully, so we can avoid a redirect
+		public function returnJSON($context) {
+			if (isset($_REQUEST['MUUsource'])) {
+				$response['status'] = 'success';
+				echo(json_encode($response));
+				exit;
+			}
+			
+		}
 		
 		public function initaliseAdminPageHead($context) {
 			$page = $context['parent']->Page;

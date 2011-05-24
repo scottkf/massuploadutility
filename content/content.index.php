@@ -4,15 +4,13 @@
 	require_once(TOOLKIT . '/class.sectionmanager.php');
 	require_once(TOOLKIT . '/class.entrymanager.php');
 	require_once(CORE . '/class.frontend.php');
+	require_once(CONTENT . '/content.publish.php');
 
 	/**
 	 * Called to build the content for the page. 
 	 */
 
-	class contentExtensionMassUploadUtilityIndex extends AdministrationPage {
-		protected $_errors = array();
-		protected $_valid = false;
-		protected $_message = '';
+	class contentExtensionMassUploadUtilityIndex extends contentPublish {
 		
 		public function getSectionId() {
 			$sectionManager = new SectionManager(Frontend::instance());
@@ -43,18 +41,15 @@
 			$_POST['action']['save'] = true;
 			
 
-			require_once(CONTENT . '/content.publish.php');
-			$content = new contentPublish($this->_Parent);
 			// this is used by contentPublish to see the source section
-			$content->_context = array();
-			$content->_context['section_handle'] = General::sanitize($_REQUEST['MUUsource']);
+			$this->_context['section_handle'] = General::sanitize($_REQUEST['MUUsource']);
 
 			// this function takes care of all the entry adding
-			$content->__actionNew();
-			
-			$response['errors'] = $content->_errors;
-			$response['status'] = (count($content->_errors) ? 'error' : 'success');
-			$response['message'] = ($content->Alert instanceof Alert ? $content->Alert->__get('message') : '');
+			$this->__actionNew();
+
+			$response['errors'] = $this->_errors;
+			$response['status'] = (count($this->_errors) ? 'error' : 'success');
+			$response['message'] = ($this->Alert instanceof Alert ? $this->Alert->__get('message') : '');
 
 			echo(json_encode($response));
 				
