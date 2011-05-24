@@ -47,6 +47,7 @@
 			// this function takes care of all the entry adding
 			$this->__actionNew();
 
+			// we only get here if there's an error
 			$response['errors'] = $this->_errors;
 			$response['status'] = (count($this->_errors) ? 'error' : 'success');
 			$response['message'] = ($this->Alert instanceof Alert ? $this->Alert->__get('message') : '');
