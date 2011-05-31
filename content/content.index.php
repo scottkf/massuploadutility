@@ -39,7 +39,7 @@
 
 			$_POST = $_REQUEST;
 			$_POST['action']['save'] = true;
-			
+			$_POST['action']['muu'] = true;
 
 			// this is used by contentPublish to see the source section
 			$this->_context['section_handle'] = General::sanitize($_REQUEST['MUUsource']);

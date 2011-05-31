@@ -43,7 +43,6 @@
 			fileField.attr('multiple', 'true');
 			fileField.parent().append(" \
 				<input type='hidden' name='MUUsource' value='"+source+"' /> \
-				<input type='hidden' name='action[api]' value='true' /> \
 				<div id='progress_report'> \
 					<div id='progress_report_name'></div> \
 					<div id='progress_report_status'></div> \

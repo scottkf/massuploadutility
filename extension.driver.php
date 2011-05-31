@@ -10,8 +10,8 @@
 		public function about() {
 			return array(
 				'name'			=> 'Mass Upload Utility',
-				'version'		=> '0.9.6',
-				'release-date'	=> '2011-05-18',
+				'version'		=> '0.9.8',
+				'release-date'	=> '2011-05-31',
 				'author'		=> array(
 					'name'			=> 'Scott Tesoriere',
 					'website'		=> 'http://tesoriere.com',
@@ -59,7 +59,7 @@
 
 		// this only reaches here if an entry is created successfully, so we can avoid a redirect
 		public function returnJSON($context) {
-			if (isset($_REQUEST['MUUsource'])) {
+			if (isset($_REQUEST['MUUsource']) && isset($_POST['action']) && $_POST['action']['muu'] == true) {
 				$response['status'] = 'success';
 				echo(json_encode($response));
 				exit;
