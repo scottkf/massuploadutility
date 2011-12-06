@@ -26,7 +26,7 @@
 		// this should theoretically support any upload field
 		fileField = $("input[type='file']");
 		form = fileField.parents('form');
-		urlBase = window.location.protocol + '//' + window.location.hostname + window.location.pathname.replace(/(.*)\/symphony\/.*/i,'$1');
+		urlBase = window.location.protocol + '//' + window.location.host + window.location.pathname.replace(/(.*)\/symphony\/.*/i,'$1');
 		urlMuu = "/symphony/extension/massuploadutility/"
 		urlAssets = urlBase + '/extensions/massuploadutility/assets';
 		source = window.location.pathname.replace(/.*\/symphony\/publish\/(.*)\/new\//i,'$1');
