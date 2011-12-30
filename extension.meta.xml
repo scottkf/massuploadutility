@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<extension id="mass_upload_utility" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+	<name>Mass Upload Utility</name>
+	<description>Allows you to jam lots of Files (that already exist or you upload) into a section. The section must have an upload Field.</description>
+	<repo type="github">https://github.com/scottkf/massuploadutility</repo>
+	<authors>
+		<author>
+			<name github="username" symphony="username">Scott Tesoriere</name>
+			<email>scott@tesoriere.com</email>
+			<website>http://tesoriere.com</website>
+		</author>
+	</authors>
+	<releases>
+		<release version="0.9.9" date="2011-12-30">
+            * Support for symphony's new style of metadata
+		</release>
+	</releases>
+</extension>
