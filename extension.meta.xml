@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<extension id="mass_upload_utility" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+<extension id="massuploadutility" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
 	<name>Mass Upload Utility</name>
 	<description>Allows you to jam lots of Files (that already exist or you upload) into a section. The section must have an upload Field.</description>
 	<repo type="github">https://github.com/scottkf/massuploadutility</repo>
