@@ -101,7 +101,7 @@
 		    },
 		    onFinishOne: function(event, response, name, number, total) {
 					// change errorsInQueue to true if you want errors shown in the queue and not on the fields themselves
-					errorsInQueue = false;
+          // errorsInQueue = false;
 					json = $.parseJSON(response);
 					id = idSafeFilename(name);
 					p = "<p id='"+id+"'>";
